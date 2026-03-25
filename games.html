@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRNX — Games Flamenguizados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;0,700;1,300&family=Barlow+Condensed:wght@300;400;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --red: #CC0000;
+  --red-hot: #FF1A1A;
+  --red-dark: #8B0000;
+  --black: #080808;
+  --black-mid: #111111;
+  --black-soft: #1A1A1A;
+  --white: #F5F0EB;
+  --white-dim: #B8B0A8;
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --pixel-green: #00FF41;
+  --pixel-cyan: #00FFFF;
+  --charcoal: #222222;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* NOISE */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 3px 3px;
+  pointer-events: none; z-index: 9999;
+}
+
+/* SCANLINES overlay */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none; z-index: 9998;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+  padding: 6rem 2rem 4rem;
+}
+
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 40%, rgba(180,0,0,0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 20% 80%, rgba(100,0,0,0.1) 0%, transparent 60%),
+    var(--black);
+  z-index: 0;
+}
+
+/* pixel grid bg */
+.hero-pixelgrid {
+  position: absolute; inset: 0; z-index: 1;
+  background-image:
+    linear-gradient(rgba(204,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(204,0,0,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridScroll 20s linear infinite;
+}
+@keyframes gridScroll {
+  to { background-position: 40px 40px; }
+}
+
+.hero-content { position: relative; z-index: 10; }
+
+.hero-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  color: var(--pixel-green);
+  background: rgba(0,255,65,0.08);
+  border: 1px solid rgba(0,255,65,0.25);
+  padding: 0.5rem 1.2rem;
+  display: inline-block;
+  margin-bottom: 2rem;
+  animation: fadeDown 0.8s ease both;
+}
+
+.hero-eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.4em;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.8s 0.3s ease both;
+}
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(4rem, 14vw, 11rem);
+  line-height: 0.88;
+  letter-spacing: 0.03em;
+  animation: fadeUp 0.8s 0.5s ease both;
+}
+.hero-title .accent { color: var(--red); }
+.hero-title .pixel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+  color: var(--pixel-green);
+  display: block;
+  letter-spacing: 0.1em;
+  margin-top: 1rem;
+  line-height: 1.6;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  color: var(--white-dim);
+  max-width: 560px;
+  margin: 2rem auto 0;
+  line-height: 1.7;
+  animation: fadeUp 0.8s 0.7s ease both;
+}
+.hero-sub strong { color: var(--white); font-weight: 600; }
+
+.hero-stats {
+  display: flex; gap: 3rem; justify-content: center; flex-wrap: wrap;
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid rgba(245,240,235,0.07);
+  animation: fadeUp 0.8s 0.9s ease both;
+}
+.stat-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; color: var(--red); line-height: 1;
+}
+.stat-l {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.65rem; letter-spacing: 0.25em;
+  color: var(--white-dim); text-transform: uppercase; margin-top: 4px;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1.25rem 2.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(8,8,8,0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(245,240,235,0.06);
+}
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem; letter-spacing: 0.12em; color: var(--white);
+}
+.nav-logo span { color: var(--red); }
+.nav-right {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem; color: var(--pixel-green);
+  letter-spacing: 0.1em;
+}
+.nav-right::before {
+  content: '▶ ';
+}
+
+/* ── SECTION COMMON ── */
+section { padding: 6rem 2.5rem; position: relative; }
+
+.section-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem; letter-spacing: 0.4em;
+  color: var(--red); text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.section-label::before {
+  content: ''; display: block; width: 28px; height: 1px;
+  background: var(--red); flex-shrink: 0;
+}
+
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 0.95; letter-spacing: 0.03em;
+  margin-bottom: 0.5rem;
+}
+.section-sub {
+  font-size: 1rem; font-weight: 300; color: var(--white-dim);
+  line-height: 1.7; max-width: 560px; margin-bottom: 3rem;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--red), transparent);
+}
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+  margin-bottom: 3rem; align-items: center;
+}
+.filter-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+  background: transparent; color: var(--white-dim);
+  border: 1px solid rgba(245,240,235,0.15);
+  padding: 0.5rem 1.2rem; cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-btn:hover { border-color: var(--red); color: var(--white); }
+.filter-btn.active {
+  background: var(--red); color: var(--white);
+  border-color: var(--red);
+}
+.filter-btn.pixel-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem; letter-spacing: 0.05em;
+  padding: 0.6rem 1rem;
+}
+.filter-btn.pixel-btn.active {
+  background: var(--pixel-green);
+  color: var(--black);
+  border-color: var(--pixel-green);
+}
+
+/* ── GAME GRID ── */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1px;
+  background: rgba(245,240,235,0.06);
+  border: 1px solid rgba(245,240,235,0.06);
+}
+
+/* ── GAME CARD ── */
+.game-card {
+  background: var(--black);
+  padding: 0;
+  position: relative; overflow: hidden;
+  transition: background 0.3s;
+  cursor: pointer;
+  display: flex; flex-direction: column;
+}
+.game-card:hover { background: var(--black-mid); }
+
+.game-card-top {
+  position: relative;
+  height: 180px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+/* pixel art bg per card */
+.card-pixel-bg {
+  position: absolute; inset: 0;
+  background-size: 8px 8px;
+  opacity: 0.08;
+}
+
+.game-card:hover .card-pixel-bg { opacity: 0.15; transition: opacity 0.3s; }
+
+.card-cover-icon {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 5rem;
+  line-height: 1;
+  position: relative; z-index: 2;
+  text-align: center;
+  opacity: 0.85;
+  transition: transform 0.3s, opacity 0.3s;
+  user-select: none;
+}
+.game-card:hover .card-cover-icon { transform: scale(1.08); opacity: 1; }
+
+.card-platform-stripe {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+
+.card-era-badge {
+  position: absolute; top: 14px; right: 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.42rem; letter-spacing: 0.05em;
+  padding: 4px 8px;
+  z-index: 3;
+}
+
+.card-rating {
+  position: absolute; bottom: 14px; left: 14px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem; color: var(--gold);
+  z-index: 3;
+}
+
+.game-card-body { padding: 1.5rem; flex: 1; }
+
+.card-original {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.68rem; letter-spacing: 0.2em;
+  color: var(--white-dim); text-transform: uppercase;
+  text-decoration: line-through; opacity: 0.6;
+  margin-bottom: 0.3rem;
+}
+
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem; letter-spacing: 0.05em; line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.card-desc {
+  font-size: 0.85rem; font-weight: 300; color: var(--white-dim);
+  line-height: 1.65; margin-bottom: 1.25rem;
+}
+
+.card-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.card-tag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+  border: 1px solid rgba(245,240,235,0.12);
+  color: var(--white-dim); padding: 0.15rem 0.5rem;
+}
+
+.card-bottom {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(245,240,235,0.06);
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.card-xp {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem; color: var(--gold);
+}
+.card-xp span {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.6rem; letter-spacing: 0.2em; color: var(--white-dim);
+  text-transform: uppercase; margin-left: 4px;
+}
+
+.card-play-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  background: transparent; color: var(--red);
+  border: 1px solid rgba(204,0,0,0.4); padding: 0.4rem 1rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.card-play-btn:hover { background: var(--red); color: var(--white); }
+
+/* ── PLATFORM COLORS ── */
+.p-nintendo .card-platform-stripe { background: linear-gradient(90deg, #e4000f, #ff4444); }
+.p-nintendo .card-era-badge { background: rgba(228,0,15,0.15); color: #ff4444; border: 1px solid rgba(228,0,15,0.3); }
+.p-nintendo .card-cover-icon { color: #ff4444; }
+
+.p-playstation .card-platform-stripe { background: linear-gradient(90deg, #003087, #0070cc); }
+.p-playstation .card-era-badge { background: rgba(0,48,135,0.2); color: #4da6ff; border: 1px solid rgba(0,112,204,0.3); }
+.p-playstation .card-cover-icon { color: #4da6ff; }
+
+.p-xbox .card-platform-stripe { background: linear-gradient(90deg, #107C10, #52b043); }
+.p-xbox .card-era-badge { background: rgba(16,124,16,0.15); color: #52b043; border: 1px solid rgba(82,176,67,0.3); }
+.p-xbox .card-cover-icon { color: #52b043; }
+
+.p-atari .card-platform-stripe { background: linear-gradient(90deg, var(--pixel-green), var(--pixel-cyan)); }
+.p-atari .card-era-badge { background: rgba(0,255,65,0.1); color: var(--pixel-green); border: 1px solid rgba(0,255,65,0.3); font-family: 'Press Start 2P', monospace; }
+.p-atari .card-cover-icon { color: var(--pixel-green); font-family: 'Press Start 2P', monospace; font-size: 2.5rem; letter-spacing: -0.05em; }
+.p-atari .card-title { font-family: 'Press Start 2P', monospace; font-size: 0.9rem; line-height: 1.5; letter-spacing: 0.05em; color: var(--pixel-green); }
+.p-atari .card-desc { font-family: 'Barlow Condensed', sans-serif; font-size: 0.82rem; }
+
+.p-arcade .card-platform-stripe { background: linear-gradient(90deg, var(--gold-dark,#A07820), var(--gold)); }
+.p-arcade .card-era-badge { background: rgba(201,168,76,0.1); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+.p-arcade .card-cover-icon { color: var(--gold); }
+
+.p-gta .card-platform-stripe { background: linear-gradient(90deg, #2a2a2a, #555); }
+.p-gta .card-era-badge { background: rgba(100,100,100,0.15); color: #ccc; border: 1px solid rgba(150,150,150,0.3); }
+.p-gta .card-cover-icon { color: var(--red); }
+
+/* pixel bg variants */
+.bg-1 { background-image: linear-gradient(rgba(204,0,0,0.3) 1px, transparent 1px), linear-gradient(90deg,rgba(204,0,0,0.3) 1px,transparent 1px); }
+.bg-2 { background-image: radial-gradient(circle, rgba(204,0,0,0.4) 1px, transparent 1px); background-size: 12px 12px; }
+.bg-3 { background-image: linear-gradient(45deg, rgba(201,168,76,0.2) 25%,transparent 25%), linear-gradient(-45deg,rgba(201,168,76,0.2) 25%,transparent 25%), linear-gradient(45deg,transparent 75%,rgba(201,168,76,0.2) 75%), linear-gradient(-45deg,transparent 75%,rgba(201,168,76,0.2) 75%); background-size:10px 10px; }
+.bg-4 { background-image: linear-gradient(rgba(0,255,65,0.25) 1px, transparent 1px), linear-gradient(90deg,rgba(0,255,65,0.25) 1px,transparent 1px); background-size: 6px 6px; }
+.bg-5 { background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px); background-size:16px 16px; }
+
+/* ── FEATURED CARD (GTA FAVELA) ── */
+.game-card.featured {
+  grid-column: span 2;
+}
+.game-card.featured .game-card-top { height: 260px; }
+.game-card.featured .card-cover-icon { font-size: 3rem; }
+.game-card.featured .card-title { font-size: 2.5rem; }
+
+/* GTA Favela special */
+.gta-scene {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: flex-end;
+  padding: 1.5rem;
+  background: linear-gradient(180deg, transparent 40%, rgba(8,8,8,0.95) 100%);
+}
+.gta-art {
+  width: 100%; height: 100%;
+  position: absolute; inset: 0;
+  overflow: hidden;
+}
+.gta-skyline {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; align-items: flex-end; gap: 3px; padding: 0 8px;
+}
+.gta-building {
+  background: var(--charcoal);
+  border-top: 2px solid rgba(204,0,0,0.6);
+  flex-shrink: 0;
+}
+.gta-favela-hut {
+  width: 18px; background: #8B0000;
+  border-top: 3px solid var(--red);
+}
+.gta-stars {
+  position: absolute; inset: 0;
+}
+.star {
+  position: absolute; width: 2px; height: 2px;
+  background: white; border-radius: 50%;
+  animation: twinkle 2s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%,100% { opacity: 1; } 50% { opacity: 0.2; }
+}
+.gta-wanted {
+  position: absolute; top: 14px; left: 14px; z-index: 4;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.7rem; letter-spacing: 0.15em;
+  color: var(--black); background: var(--gold);
+  padding: 3px 10px;
+}
+.star-rating {
+  display: flex; gap: 3px;
+}
+.star-pip {
+  width: 14px; height: 14px;
+  background: var(--gold); clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+}
+.star-pip.empty { background: rgba(201,168,76,0.25); }
+
+/* ── ZELDA SPECIAL CARD ── */
+.zelda-card .game-card-top {
+  background: linear-gradient(135deg, #0a1a0a 0%, #0f2a0f 50%, #051005 100%);
+}
+.zelda-map {
+  position: absolute; inset: 0; z-index: 1; overflow: hidden;
+}
+.zelda-tile {
+  position: absolute; border: 1px solid rgba(0,255,65,0.08);
+  background: rgba(0,255,65,0.04);
+}
+.zelda-link {
+  position: absolute; z-index: 3;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.8rem; color: var(--red);
+  bottom: 30px; left: 50%;
+  transform: translateX(-50%);
+  animation: linkWalk 1s steps(2) infinite;
+}
+@keyframes linkWalk {
+  0% { transform: translateX(-50%) scaleX(1); }
+  50% { transform: translateX(-46%) scaleX(-1); }
+  100% { transform: translateX(-50%) scaleX(1); }
+}
+.zelda-hearts {
+  position: absolute; top: 14px; left: 14px; z-index: 4;
+  display: flex; gap: 4px;
+}
+.heart { color: var(--red); font-size: 1rem; }
+
+/* ── ATARI SECTION ── */
+.atari-section { background: var(--black); }
+.atari-header {
+  display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem;
+}
+.atari-logo-pixel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.2rem; color: var(--pixel-green);
+  border: 2px solid var(--pixel-green);
+  padding: 0.5rem 1rem;
+  box-shadow: 3px 3px 0 var(--red);
+}
+.atari-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1px;
+  background: rgba(0,255,65,0.08);
+  border: 1px solid rgba(0,255,65,0.15);
+  margin-top: 2rem;
+}
+.atari-card {
+  background: var(--black);
+  padding: 1.75rem 1.5rem;
+  position: relative; overflow: hidden;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+.atari-card:hover { background: rgba(0,255,65,0.04); }
+.atari-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--pixel-green);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.atari-card:hover::before { transform: scaleX(1); }
+.atari-pixel-art {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 2rem; color: var(--pixel-green);
+  margin-bottom: 1rem; display: block;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(0,255,65,0.4));
+}
+.atari-original {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.65rem; letter-spacing: 0.2em; color: var(--white-dim);
+  text-transform: uppercase; text-decoration: line-through; opacity: 0.5;
+  margin-bottom: 0.3rem;
+}
+.atari-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.75rem; color: var(--pixel-green); line-height: 1.5;
+  margin-bottom: 0.75rem; letter-spacing: 0.05em;
+}
+.atari-desc {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem; color: var(--white-dim); line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.atari-score {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem; color: var(--gold);
+  letter-spacing: 0.1em;
+}
+.atari-score::before { content: 'HI-SCORE: '; }
+
+/* ── GTA FAVELA SECTION ── */
+.gta-section {
+  background: var(--black-mid);
+  position: relative;
+  overflow: hidden;
+}
+.gta-section-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(139,0,0,0.08) 0%, transparent 60%);
+  z-index: 0;
+}
+.gta-section > * { position: relative; z-index: 1; }
+.gta-splash {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(5rem, 16vw, 13rem);
+  line-height: 0.85; letter-spacing: 0.02em;
+  color: rgba(204,0,0,0.06);
+  position: absolute;
+  right: -2%;
+  top: 50%; transform: translateY(-50%);
+  z-index: 0; user-select: none; pointer-events: none;
+  white-space: nowrap;
+}
+
+.gta-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: center;
+}
+.gta-screenshot {
+  background: var(--black-soft);
+  border: 1px solid rgba(245,240,235,0.08);
+  position: relative; overflow: hidden;
+  aspect-ratio: 16/10;
+}
+.gta-hud {
+  position: absolute; inset: 0; padding: 1rem;
+  font-family: 'Bebas Neue', sans-serif;
+}
+.hud-health {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 1rem; color: var(--red);
+}
+.hud-bar {
+  height: 8px; flex: 1; background: rgba(245,240,235,0.1);
+  position: relative; overflow: hidden;
+}
+.hud-bar-fill {
+  height: 100%; background: var(--red); width: 73%;
+}
+.hud-money {
+  position: absolute; top: 1rem; right: 1rem;
+  font-size: 1.4rem; color: var(--gold); text-align: right;
+}
+.hud-stars {
+  position: absolute; bottom: 1rem; right: 1rem;
+  display: flex; gap: 3px;
+}
+.hud-star {
+  width: 18px; height: 18px; background: var(--gold);
+  clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+}
+.hud-star.empty { background: rgba(201,168,76,0.2); }
+.hud-map {
+  position: absolute; bottom: 1rem; left: 1rem;
+  width: 80px; height: 80px;
+  border: 1px solid rgba(245,240,235,0.2);
+  background: rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+.gta-street-scene {
+  position: absolute; inset: 2.5rem; bottom: 3.5rem;
+  display: flex; align-items: flex-end; gap: 4px;
+}
+.gta-building-s {
+  background: var(--charcoal);
+  border-top: 2px solid rgba(204,0,0,0.5);
+}
+.gta-char {
+  position: absolute;
+  bottom: 3rem; left: 50%; transform: translateX(-50%);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.5rem; color: var(--red);
+  text-shadow: 2px 2px 0 var(--black);
+  z-index: 2;
+}
+.gta-floor {
+  position: absolute; bottom: 2.5rem; left: 1rem; right: 1rem;
+  height: 2px; background: rgba(245,240,235,0.1);
+}
+
+.gta-features { display: flex; flex-direction: column; gap: 1.5rem; }
+.gta-feature {
+  display: grid; grid-template-columns: 56px 1fr;
+  gap: 1rem; align-items: start;
+}
+.gta-feat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; color: var(--red); line-height: 1;
+}
+.gta-feat-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--white);
+  margin-bottom: 0.25rem;
+}
+.gta-feat-desc {
+  font-size: 0.85rem; font-weight: 300; color: var(--white-dim); line-height: 1.6;
+}
+
+/* ── ZELDA SECTION ── */
+.zelda-section { background: var(--black); }
+.zelda-world {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 4rem; align-items: center;
+}
+.zelda-dungeon-map {
+  background: var(--black-soft);
+  border: 1px solid rgba(0,255,65,0.15);
+  padding: 2rem;
+  font-family: 'Press Start 2P', monospace;
+  position: relative; overflow: hidden;
+}
+.dungeon-title {
+  font-size: 0.5rem; color: var(--pixel-green); letter-spacing: 0.15em;
+  margin-bottom: 1.5rem; text-transform: uppercase;
+}
+.dungeon-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 40px);
+  grid-template-rows: repeat(5, 40px);
+  gap: 2px;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.d-room {
+  width: 40px; height: 40px;
+  border: 1px solid rgba(0,255,65,0.3);
+  background: rgba(0,255,65,0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem; color: var(--pixel-green);
+  position: relative; cursor: pointer;
+  transition: background 0.2s;
+}
+.d-room:hover { background: rgba(0,255,65,0.12); }
+.d-room.empty { background: transparent; border-color: transparent; }
+.d-room.boss {
+  background: rgba(204,0,0,0.2);
+  border-color: var(--red);
+  color: var(--red);
+}
+.d-room.current {
+  background: rgba(0,255,65,0.2);
+  border-color: var(--pixel-green);
+  animation: roomPulse 1.5s ease-in-out infinite;
+}
+@keyframes roomPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,255,65,0.4); }
+  50% { box-shadow: 0 0 0 4px rgba(0,255,65,0.1); }
+}
+.d-room.treasure { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+.d-room.locked { border-color: rgba(245,240,235,0.2); color: rgba(245,240,235,0.3); }
+.dungeon-legend {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+}
+.legend-item {
+  font-size: 0.38rem; color: var(--white-dim); letter-spacing: 0.1em;
+  display: flex; align-items: center; gap: 4px; text-transform: uppercase;
+}
+.legend-dot {
+  width: 8px; height: 8px; border: 1px solid;
+}
+
+.zelda-items { display: flex; flex-direction: column; gap: 1.25rem; }
+.zelda-item {
+  background: var(--black-soft);
+  border: 1px solid rgba(245,240,235,0.06);
+  padding: 1.25rem 1.5rem;
+  display: grid; grid-template-columns: 48px 1fr;
+  gap: 1rem; align-items: center;
+  transition: border-color 0.2s; cursor: pointer;
+}
+.zelda-item:hover { border-color: rgba(0,255,65,0.25); }
+.zelda-item-icon {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.5rem; color: var(--pixel-green);
+  text-align: center; line-height: 1;
+}
+.zelda-item-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem; font-weight: 700; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--white); margin-bottom: 0.2rem;
+}
+.zelda-item-desc { font-size: 0.8rem; color: var(--white-dim); font-weight: 300; line-height: 1.5; }
+
+/* ── REVEAL ANIMATION ── */
+.reveal {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── PIXEL COUNTER ── */
+.live-counter {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem; color: var(--pixel-green);
+  letter-spacing: 0.1em;
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-bottom: 3rem;
+}
+.live-counter::before {
+  content: '';
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--pixel-green);
+  animation: pulse 1s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.6)} }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--black);
+  border-top: 1px solid rgba(245,240,235,0.07);
+  padding: 4rem 2.5rem;
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 3rem; align-items: center;
+}
+.footer-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.5rem; color: var(--white); letter-spacing: 0.05em; line-height: 1;
+}
+.footer-brand span { color: var(--red); }
+.footer-brand .pixel-sub {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem; color: var(--pixel-green);
+  display: block; margin-top: 0.5rem; letter-spacing: 0.1em;
+}
+.footer-meta {
+  text-align: right;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem; letter-spacing: 0.2em;
+  color: var(--white-dim); text-transform: uppercase; line-height: 2;
+}
+.footer-meta strong { color: var(--gold); font-size: 0.85rem; display: block; margin-bottom: 0.25rem; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .gta-content { grid-template-columns: 1fr; }
+  .zelda-world { grid-template-columns: 1fr; }
+  .game-card.featured { grid-column: span 1; }
+  footer { grid-template-columns: 1fr; }
+  .footer-meta { text-align: left; }
+}
+@media (max-width: 600px) {
+  .games-grid { grid-template-columns: 1fr; }
+  .atari-grid { grid-template-columns: 1fr; }
+  .hero-stats { gap: 1.5rem; }
+  section { padding: 4rem 1.25rem; }
+  nav { padding: 1rem 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">SRNX <span>·</span> Games</div>
+  <div class="nav-right">INSERT COIN</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pixelgrid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">PLAYER 1 — NAÇÃO RUBRO-NEGRA — PRESS START</div>
+    <div class="hero-eyebrow">SRNX Game Lab · Edição Especial</div>
+    <h1 class="hero-title">
+      <span class="accent">GAMES</span><br>FLAMEN<span class="accent">GUI</span>ZADOS
+      <span class="pixel">LEVEL UP A PAIXÃO RUBRO-NEGRA</span>
+    </h1>
+    <p class="hero-sub">
+      Os maiores clássicos do videogame <strong>reescritos com alma rubro-negra</strong>. Da pixelada era Atari ao mundo aberto das favelas cariocas — a Nação invade todos os consoles.
+    </p>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-n">28</div>
+        <div class="stat-l">Jogos flamenguizados</div>
+      </div>
+      <div>
+        <div class="stat-n">5</div>
+        <div class="stat-l">Plataformas</div>
+      </div>
+      <div>
+        <div class="stat-n">∞</div>
+        <div class="stat-l">XP da Nação</div>
+      </div>
+      <div>
+        <div class="stat-n">1</div>
+        <div class="stat-l">Amor: Flamengo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MAIN GAMES GRID -->
+<section id="jogos" style="background:var(--black-mid)">
+  <div class="section-label reveal">Catálogo</div>
+  <h2 class="section-title reveal">A Nação<br>Joga Diferente</h2>
+  <p class="section-sub reveal">Filtrar por plataforma ou explorar tudo — cada jogo reimaginado com personagens, cenários e alma do maior clube do Brasil.</p>
+
+  <div class="live-counter reveal" id="game-counter">25 JOGOS DISPONÍVEIS</div>
+
+  <div class="filter-bar reveal">
+    <button class="filter-btn active" data-plat="all">Todos</button>
+    <button class="filter-btn" data-plat="p-nintendo">Nintendo</button>
+    <button class="filter-btn" data-plat="p-playstation">PlayStation</button>
+    <button class="filter-btn" data-plat="p-xbox">Xbox / PC</button>
+    <button class="filter-btn pixel-btn" data-plat="p-atari">ATARI</button>
+    <button class="filter-btn" data-plat="p-arcade">Arcade</button>
+    <button class="filter-btn" data-plat="p-gta">GTA Favela</button>
+  </div>
+
+  <div class="games-grid reveal" id="games-grid">
+
+    <!-- GTA FAVELA FEATURED -->
+    <div class="game-card p-gta featured" data-plat="p-gta">
+      <div class="game-card-top">
+        <div class="card-pixel-bg bg-1"></div>
+        <div class="gta-art">
+          <!-- Stars -->
+          <div class="gta-stars" id="gta-stars"></div>
+          <!-- Skyline -->
+          <div class="gta-skyline">
+            <div class="gta-building" style="width:24px;height:60px"></div>
+            <div class="gta-building gta-favela-hut" style="height:35px"></div>
+            <div class="gta-building" style="width:18px;height:80px"></div>
+            <div class="gta-building gta-favela-hut" style="height:28px;width:22px"></div>
+            <div class="gta-building" style="width:30px;height:50px"></div>
+            <div class="gta-building gta-favela-hut" style="height:42px;width:20px"></div>
+            <div class="gta-building" style="width:22px;height:95px"></div>
+            <div class="gta-building gta-favela-hut" style="height:30px;width:16px"></div>
+            <div class="gta-building" style="width:35px;height:65px"></div>
+            <div class="gta-building" style="width:20px;height:45px"></div>
+            <div class="gta-building gta-favela-hut" style="height:38px"></div>
+            <div class="gta-building" style="width:28px;height:72px"></div>
+            <div class="gta-building gta-favela-hut" style="height:25px;width:24px"></div>
+            <div class="gta-building" style="width:16px;height:55px"></div>
+            <div class="gta-building" style="width:32px;height:88px"></div>
+            <div class="gta-building gta-favela-hut" style="height:32px;width:18px"></div>
+            <div class="gta-building" style="width:24px;height:48px"></div>
+          </div>
+        </div>
+        <div class="gta-wanted">★ NÍVEL 5 — PROCURADO</div>
+        <div class="gta-scene">
+          <div style="display:flex;gap:0.5rem;align-items:center">
+            <div class="star-rating">
+              <div class="star-pip"></div>
+              <div class="star-pip"></div>
+              <div class="star-pip"></div>
+              <div class="star-pip"></div>
+              <div class="star-pip"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">Grand Theft Auto V</div>
+        <div class="card-title" style="font-size:2.2rem;color:var(--red)">GTA: Favela Rubro-Negra</div>
+        <div class="card-desc">Mundo aberto ambientado no Rio de Janeiro rubro-negro. Do Complexo do Alemão ao Maracanã, do Ninho do Urubu à Zona Sul. Missões: roubar a taça do rival, defender o CT de invasores tricolores e organizar a maior festa de título da história da cidade.</div>
+        <div class="card-tags">
+          <span class="card-tag">Mundo Aberto</span>
+          <span class="card-tag">Rio de Janeiro</span>
+          <span class="card-tag">Missões da Nação</span>
+          <span class="card-tag">Coop 4 jogadores</span>
+          <span class="card-tag">RPG</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">5.000 <span>XP Missão</span></div>
+        <button class="card-play-btn" onclick="alert('GTA: Favela Rubro-Negra - Em desenvolvimento!')">Ver Detalhes →</button>
+      </div>
+    </div>
+
+    <!-- ZELDA -->
+    <div class="game-card p-nintendo zelda-card" data-plat="p-nintendo">
+      <div class="game-card-top" style="background:linear-gradient(135deg,#0a1a0a,#051005)">
+        <div class="gta-art zelda-map" id="zelda-tiles"></div>
+        <div class="zelda-hearts">
+          <span class="heart">♥</span><span class="heart">♥</span><span class="heart">♥</span>
+          <span class="heart" style="opacity:0.3">♥</span><span class="heart" style="opacity:0.3">♥</span>
+        </div>
+        <div class="card-era-badge" style="background:rgba(0,255,65,0.1);color:var(--pixel-green);border:1px solid rgba(0,255,65,0.3);font-family:'Press Start 2P',monospace;font-size:0.4rem">SNES</div>
+        <div class="zelda-link">⚔</div>
+        <div class="card-rating">★★★★★</div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">The Legend of Zelda: A Link to the Past</div>
+        <div class="card-title" style="font-family:'Press Start 2P',monospace;font-size:0.72rem;line-height:1.6;color:var(--pixel-green)">A LENDA DA<br>NAÇÃO</div>
+        <div class="card-desc">Zico, herói de Hyrule Rubro-Negra, porta a Espada Dourada da Gávea e a Tríforce das Taças. Atravessa masmorras temáticas: a Dungeon do São Januário, o Templo do Engenhão e o Palácio das Sombras Tricolores. Princesa Copa foi capturada pelo vilão Ganon Vascaíno.</div>
+        <div class="card-tags">
+          <span class="card-tag">RPG Pixel</span>
+          <span class="card-tag">Top-Down</span>
+          <span class="card-tag">8 Masmorras</span>
+          <span class="card-tag">Itens secretos</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">1.200 <span>XP</span></div>
+        <button class="card-play-btn">Ver Mapa →</button>
+      </div>
+    </div>
+
+    <!-- MARIO -->
+    <div class="game-card p-nintendo" data-plat="p-nintendo">
+      <div class="game-card-top">
+        <div class="card-pixel-bg bg-2"></div>
+        <div class="card-platform-stripe"></div>
+        <div class="card-era-badge">NES</div>
+        <div class="card-cover-icon">G<br>B</div>
+        <div class="card-rating">★★★★★</div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">Super Mario Bros</div>
+        <div class="card-title">Mengão Bros</div>
+        <div class="card-desc">Gabigol e Pedro correm pelo Maracanã pulando sobre bandeiras inimigas e cogumelos tricolores. Castelo final: o Engenhão habitado pelo Rei Koopa do Botafogo. Power-up especial: Flor de Fogo Rubro-Negra.</div>
+        <div class="card-tags">
+          <span class="card-tag">Plataforma</span><span class="card-tag">2P Co-op</span><span class="card-tag">8 Fases</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">800 <span>XP</span></div>
+        <button class="card-play-btn">Ver Fases →</button>
+      </div>
+    </div>
+
+    <!-- POKEMON -->
+    <div class="game-card p-nintendo" data-plat="p-nintendo">
+      <div class="game-card-top">
+        <div class="card-pixel-bg bg-3"></div>
+        <div class="card-platform-stripe"></div>
+        <div class="card-era-badge">GB</div>
+        <div class="card-cover-icon">⚽🔴</div>
+        <div class="card-rating">★★★★☆</div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">Pokémon Red & Blue</div>
+        <div class="card-title">Mengómon Vermelho</div>
+        <div class="card-desc">Capture 151 astros rubro-negros. Starter: Ziquito (evolui em Zico → ZicoGod). Rival usa só pokémons tricolores. Ginásio especial: Maracanã Arena — vença o campeão para ganhar o badge da Libertadores.</div>
+        <div class="card-tags">
+          <span class="card-tag">RPG</span><span class="card-tag">151 Mengómons</span><span class="card-tag">Coleção</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">1.500 <span>XP</span></div>
+        <button class="card-play-btn">Ver Pokédex →</button>
+      </div>
+    </div>
+
+    <!-- GOD OF WAR -->
+    <div class="game-card p-playstation" data-plat="p-playstation">
+      <div class="game-card-top">
+        <div class="card-pixel-bg bg-5"></div>
+        <div class="card-platform-stripe"></div>
+        <div class="card-era-badge">PS5</div>
+        <div class="card-cover-icon">⚔🔴</div>
+        <div class="card-rating">★★★★★</div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">God of War</div>
+        <div class="card-title">Gol de Guerra</div>
+        <div class="card-desc">Zico, o Deus da Gávea, empunha a Chuteira da Vingança e derruba os deuses olimpicos do futebol. Chefe final: o árbitro corrompido no Monte Evercruzeiro. Frase icônica: "Mengo não morre."</div>
+        <div class="card-tags">
+          <span class="card-tag">Ação</span><span class="card-tag">Mitologia</span><span class="card-tag">Open World</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">2.000 <span>XP</span></div>
+        <button class="card-play-btn">Ver Roteiro →</button>
+      </div>
+    </div>
+
+    <!-- RESIDENT EVIL -->
+    <div class="game-card p-playstation" data-plat="p-playstation">
+      <div class="game-card-top">
+        <div class="card-pixel-bg bg-2"></div>
+        <div class="card-platform-stripe"></div>
+        <div class="card-era-badge">PS1</div>
+        <div class="card-cover-icon">🧟🔴</div>
+        <div class="card-rating">★★★★☆</div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">Resident Evil 2</div>
+        <div class="card-title">Mengsident Evil</div>
+        <div class="card-desc">Sobreviva ao Ninho do Urubu infestado. O vírus T-Tricolor transforma torcedores em zumbis raivosos. Leon Gabeiro e Claire Nação investigam o laboratório secreto da Umbrella Vascaína nos subterrâneos do CT.</div>
+        <div class="card-tags">
+          <span class="card-tag">Survival Horror</span><span class="card-tag">CT Secreto</span><span class="card-tag">2 Campanhas</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">1.800 <span>XP</span></div>
+        <button class="card-play-btn">Ver Mapa →</button>
+      </div>
+    </div>
+
+    <!-- HALO -->
+    <div class="game-card p-xbox" data-plat="p-xbox">
+      <div class="game-card-top">
+        <div class="card-pixel-bg bg-5"></div>
+        <div class="card-platform-stripe"></div>
+        <div class="card-era-badge">XBOX</div>
+        <div class="card-cover-icon">🛡🔴</div>
+        <div class="card-rating">★★★★★</div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">Halo: Combat Evolved</div>
+        <div class="card-title">Halo: Combate Rubro-Negro</div>
+        <div class="card-desc">Master Mengão acorda na Estação Espacial Maracanã e descobre que alienígenas do Convênio Tricolor querem destruir o planeta. Arma: o Canhão da Nação. Aliada: IA Tina (Cortana versão rubro-negra).</div>
+        <div class="card-tags">
+          <span class="card-tag">FPS</span><span class="card-tag">Sci-Fi</span><span class="card-tag">Coop Online</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">1.600 <span>XP</span></div>
+        <button class="card-play-btn">Ver Missões →</button>
+      </div>
+    </div>
+
+    <!-- FORZA -->
+    <div class="game-card p-xbox" data-plat="p-xbox">
+      <div class="game-card-top">
+        <div class="card-pixel-bg bg-3"></div>
+        <div class="card-platform-stripe"></div>
+        <div class="card-era-badge">XBOX</div>
+        <div class="card-cover-icon">🏎🔴</div>
+        <div class="card-rating">★★★★☆</div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">Forza Horizon 5</div>
+        <div class="card-title">Forza Horizonte Rubro</div>
+        <div class="card-desc">Festival de corridas no Rio. Circuito Aterro do Flamengo, Túnel do Cristo, Rampas do Morro da Urca. Trilha: funk carioca. Cada vitória desbloqueia pintura de título histórico no carro.</div>
+        <div class="card-tags">
+          <span class="card-tag">Racing</span><span class="card-tag">Rio Aberto</span><span class="card-tag">Festival</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">900 <span>XP</span></div>
+        <button class="card-play-btn">Ver Pistas →</button>
+      </div>
+    </div>
+
+    <!-- STREET FIGHTER -->
+    <div class="game-card p-arcade" data-plat="p-arcade">
+      <div class="game-card-top">
+        <div class="card-pixel-bg bg-3"></div>
+        <div class="card-platform-stripe"></div>
+        <div class="card-era-badge">ARCADE</div>
+        <div class="card-cover-icon">👊🔴</div>
+        <div class="card-rating">★★★★★</div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">Street Fighter II</div>
+        <div class="card-title">Street Fighter II: Edição Mengão</div>
+        <div class="card-desc">Torneio mundial com ídolos históricos. Zico usa Bicicleta Dourada (hadouken), Romário aplica o Baixinho Destroy (shoryuken), Adriano solta o Imperador Furioso (spinning kick). Fase final: árbitro corrompido como chefe secreto.</div>
+        <div class="card-tags">
+          <span class="card-tag">Luta</span><span class="card-tag">8 Lutadores</span><span class="card-tag">2P</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">1.100 <span>XP</span></div>
+        <button class="card-play-btn">Ver Movelis →</button>
+      </div>
+    </div>
+
+    <!-- MARIO KART -->
+    <div class="game-card p-nintendo" data-plat="p-nintendo">
+      <div class="game-card-top">
+        <div class="card-pixel-bg bg-2"></div>
+        <div class="card-platform-stripe"></div>
+        <div class="card-era-badge">N64</div>
+        <div class="card-cover-icon">🏁🔴</div>
+        <div class="card-rating">★★★★★</div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">Mario Kart 64</div>
+        <div class="card-title">Mengo Kart</div>
+        <div class="card-desc">Corrida de karts pelo Rio com o elenco completo. Pistas: Maracanã Grand Prix, Ninho Speedway, Ilha Urubu Circuit e a caótica São Januário Derby. Item secreto: Canhão de Confetes da Libertadores.</div>
+        <div class="card-tags">
+          <span class="card-tag">Racing</span><span class="card-tag">4 Jogadores</span><span class="card-tag">12 Pistas</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">700 <span>XP</span></div>
+        <button class="card-play-btn">Ver Pistas →</button>
+      </div>
+    </div>
+
+    <!-- TEKKEN -->
+    <div class="game-card p-playstation" data-plat="p-playstation">
+      <div class="game-card-top">
+        <div class="card-pixel-bg bg-5"></div>
+        <div class="card-platform-stripe"></div>
+        <div class="card-era-badge">PS2</div>
+        <div class="card-cover-icon">🥊🔴</div>
+        <div class="card-rating">★★★★☆</div>
+      </div>
+      <div class="game-card-body">
+        <div class="card-original">Tekken 3</div>
+        <div class="card-title">Tekken da Nação</div>
+        <div class="card-desc">Torneio Iron Fist no Setor Norte do Maracanã. Elenco: Zico, Romário, Adriano, Gabigol, Léo Pereira, Arrascaeta. Palco especial: Derbi Carioca às 22h — chuva, tensão máxima e torcida ensandecida ao fundo.</div>
+        <div class="card-tags">
+          <span class="card-tag">Luta 3D</span><span class="card-tag">6 Lutadores</span><span class="card-tag">Torneio</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-xp">950 <span>XP</span></div>
+        <button class="card-play-btn">Ver Roster →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- GTA FAVELA SECTION -->
+<section class="gta-section" id="gta">
+  <div class="gta-section-bg"></div>
+  <div class="gta-splash">GTA</div>
+
+  <div class="section-label reveal">Destaque Especial</div>
+  <h2 class="section-title reveal">GTA: Favela<br><span style="color:var(--red)">Rubro-Negra</span></h2>
+  <p class="section-sub reveal">O jogo de mundo aberto que o Rio de Janeiro merecia — nas cores do maior do Brasil.</p>
+
+  <div class="gta-content reveal">
+    <!-- Screenshot mockup -->
+    <div class="gta-screenshot">
+      <!-- HUD -->
+      <div class="gta-hud">
+        <div class="hud-health">
+          <span style="font-size:0.9rem;font-family:'Bebas Neue',sans-serif;color:var(--red);min-width:28px">HP</span>
+          <div class="hud-bar"><div class="hud-bar-fill"></div></div>
+        </div>
+        <div class="hud-money">MC 12.450<br><span style="font-size:0.7rem;color:var(--white-dim);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.15em">MENGO COINS</span></div>
+        <div class="hud-stars">
+          <div class="hud-star"></div><div class="hud-star"></div>
+          <div class="hud-star"></div><div class="hud-star empty"></div><div class="hud-star empty"></div>
+        </div>
+        <div class="hud-map" id="mini-map"></div>
+      </div>
+      <!-- Scene -->
+      <div class="gta-street-scene" id="gta-street"></div>
+      <div class="gta-char">🔴</div>
+      <div class="gta-floor"></div>
+      <!-- Mission overlay -->
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);margin-bottom:0.3rem">MISSÃO ATIVA</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--white)">Resgate a Taça</div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="gta-features">
+      <div class="gta-feature">
+        <div class="gta-feat-num">01</div>
+        <div>
+          <div class="gta-feat-title">Mundo Aberto: Rio Total</div>
+          <div class="gta-feat-desc">50km² do Rio de Janeiro fielmente recriados — da Zona Norte à Zona Sul, passando pelo Complexo do Alemão, Maracanã, Sambódromo, Lagoa Rodrigo de Freitas e Zona Portuária.</div>
+        </div>
+      </div>
+      <div class="gta-feature">
+        <div class="gta-feat-num">02</div>
+        <div>
+          <div class="gta-feat-title">Missões da Nação</div>
+          <div class="gta-feat-desc">50+ missões narrativas: infiltrar o quartel-general do rival, organizar a maior festa de título da história, transportar a taça roubada de volta ao Maracanã, e defender o Ninho de invasores.</div>
+        </div>
+      </div>
+      <div class="gta-feature">
+        <div class="gta-feat-num">03</div>
+        <div>
+          <div class="gta-feat-title">Sistema de Facções</div>
+          <div class="gta-feat-desc">Jogue como Torcida Organizada, Barra-Brava, Torcedor Fiel ou Embaixador da Nação. Cada facção tem missões exclusivas, reputação e recompensas únicas no mundo do jogo.</div>
+        </div>
+      </div>
+      <div class="gta-feature">
+        <div class="gta-feat-num">04</div>
+        <div>
+          <div class="gta-feat-title">Mengo Coins In-Game</div>
+          <div class="gta-feat-desc">A moeda do GTA Favela é o Mengo Coin — integrando ao ecossistema SRNX. Conquistas no jogo convertem em recompensas reais na plataforma: produtos, experiências e ingressos.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ZELDA SECTION -->
+<section class="zelda-section" id="zelda">
+  <div class="section-label reveal">RPG de Aventura</div>
+  <h2 class="section-title reveal">A Lenda<br>da <span style="color:var(--pixel-green);font-family:'Press Start 2P',monospace;font-size:0.55em;vertical-align:middle">NAÇÃO</span></h2>
+  <p class="section-sub reveal">A aventura épica rubro-negra em pixels — 8 masmorras, um herói lendário e uma taça para recuperar.</p>
+
+  <div class="zelda-world reveal">
+    <!-- Dungeon Map -->
+    <div>
+      <div class="zelda-dungeon-map">
+        <div class="dungeon-title">MAZMORRA 3 — TEMPLO DO MARACANÃ</div>
+        <div class="dungeon-grid" id="dungeon-grid"></div>
+        <div class="dungeon-legend">
+          <div class="legend-item"><div class="legend-dot" style="border-color:var(--pixel-green);background:rgba(0,255,65,0.2)"></div>Sala atual</div>
+          <div class="legend-item"><div class="legend-dot" style="border-color:var(--red);background:rgba(204,0,0,0.2)"></div>Chefão</div>
+          <div class="legend-item"><div class="legend-dot" style="border-color:var(--gold);background:rgba(201,168,76,0.1)"></div>Tesouro</div>
+          <div class="legend-item"><div class="legend-dot" style="border-color:rgba(245,240,235,0.2)"></div>Bloqueada</div>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem;font-family:'Press Start 2P',monospace;font-size:0.48rem;color:var(--white-dim);letter-spacing:0.1em;line-height:2">
+        INVENTÁRIO: ESPADA DOURADA · ESCUDO DA GÁVEA · 3 FRASCOS DE ENERGIA RUBRO-NEGRA
+      </div>
+    </div>
+
+    <!-- Items & Enemies -->
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.65rem;letter-spacing:0.35em;color:var(--red);text-transform:uppercase;margin-bottom:1.25rem">Itens & Inimigos Lendários</div>
+      <div class="zelda-items">
+        <div class="zelda-item">
+          <div class="zelda-item-icon">⚔</div>
+          <div>
+            <div class="zelda-item-name">Espada Dourada da Gávea</div>
+            <div class="zelda-item-desc">A arma mais poderosa da Hyrule Rubro-Negra. Forjada com o aço das taças de Libertadores. Causa dano triplo contra inimigos tricolores.</div>
+          </div>
+        </div>
+        <div class="zelda-item">
+          <div class="zelda-item-icon">🛡</div>
+          <div>
+            <div class="zelda-item-name">Escudo da Nação Eterna</div>
+            <div class="zelda-item-desc">Bloqueia 100% dos ataques negativos da imprensa. Tem o brasão do Flamengo incrustado em ouro vermelho e preto.</div>
+          </div>
+        </div>
+        <div class="zelda-item">
+          <div class="zelda-item-icon">🏺</div>
+          <div>
+            <div class="zelda-item-name">Tríforce das Taças</div>
+            <div class="zelda-item-desc">Os três fragmentos: Libertadores (poder), Brasileirão (sabedoria) e Carioca (coragem). Reunidos, invocam o estado de graça rubro-negro.</div>
+          </div>
+        </div>
+        <div class="zelda-item" style="border-color:rgba(204,0,0,0.3)">
+          <div class="zelda-item-icon" style="color:var(--red)">👹</div>
+          <div>
+            <div class="zelda-item-name">Ganon Vascaíno — Chefe Final</div>
+            <div class="zelda-item-desc">O grande vilão que capturou a Princesa Copa. Usa o poder das trevas tricolores. Fraqueza: a Luz da Gávea e o Hino do Flamengo tocado em volume máximo.</div>
+          </div>
+        </div>
+        <div class="zelda-item">
+          <div class="zelda-item-icon" style="color:var(--gold)">🗺</div>
+          <div>
+            <div class="zelda-item-name">8 Masmorras da Nação</div>
+            <div class="zelda-item-desc">São Januário, Engenhão, Nilton Santos, Arena Castelão, Maracanã, Ninho do Urubu, Ilha do Urubu e o Palácio das Sombras Tricolores.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ATARI SECTION -->
+<section class="atari-section" id="atari">
+  <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:0.5rem" class="reveal">
+    <div class="section-label" style="margin-bottom:0">Era Pixel</div>
+    <div class="atari-logo-pixel">ATARI</div>
+  </div>
+  <h2 class="section-title reveal">Pixel Art<br><span style="color:var(--pixel-green)">Rubro-Negra</span></h2>
+  <p class="section-sub reveal">Os jogos da era dourada do Atari 2600 reimaginados em pixels vermelhos e pretos — 8 bits de paixão pela Nação.</p>
+
+  <div class="atari-grid reveal">
+
+    <div class="atari-card">
+      <span class="atari-pixel-art">⬛🔴<br>⚽⚽</span>
+      <div class="atari-original">Pong (1972)</div>
+      <div class="atari-title">MENGÃO PONG</div>
+      <div class="atari-desc">Rebata a bola rubro-negra com as raquetes dos goleiros históricos. Modo especial: raquete Adriano tem hitbox 3x maior. Ganhe acumulando Mengo Points em vez de simples pontos.</div>
+      <div class="atari-score">999.999</div>
+    </div>
+
+    <div class="atari-card">
+      <span class="atari-pixel-art">🔴🔴🔴<br>⬛⬛⬛<br>👾👾👾</span>
+      <div class="atari-original">Space Invaders (1978)</div>
+      <div class="atari-title">TORCIDA INVADERS</div>
+      <div class="atari-desc">Defenda o Maracanã de ondas de invasores com camisas inimigas. Seu canhão dispara bandeiras rubro-negras. UFO secreto: o técnico rival aparece e rende 500 pontos extras.</div>
+      <div class="atari-score">847.300</div>
+    </div>
+
+    <div class="atari-card">
+      <span class="atari-pixel-art">🏟<br>👾<br>🔴</span>
+      <div class="atari-original">Asteroids (1979)</div>
+      <div class="atari-title">MENGSTEROIDS</div>
+      <div class="atari-desc">Nave rubro-negra destrói asteroides com o símbolo dos rivais pelo Universo da Bola. Cada asteroide grande quebra em 3 chuteiras. Fase bônus: desvie das manchetes negativas da imprensa.</div>
+      <div class="atari-score">612.800</div>
+    </div>
+
+    <div class="atari-card">
+      <span class="atari-pixel-art">⬛🏆⬛<br>🔴🔴🔴<br>⬛🔴⬛</span>
+      <div class="atari-original">Donkey Kong (1981)</div>
+      <div class="atari-title">MENGÃO KONG</div>
+      <div class="atari-desc">Zico sobe as arquibancadas do Maracanã desviando de bandeiras lançadas pelo Gorila Tricolor. Resgate a Taça presa no topo. Bônus: pule em cima de 3 bandeiras seguidas para martelo de ouro.</div>
+      <div class="atari-score">524.000</div>
+    </div>
+
+    <div class="atari-card">
+      <span class="atari-pixel-art">⚽🔴⚽<br>👾👾👾<br>🔴⬛🔴</span>
+      <div class="atari-original">Pac-Man (1980)</div>
+      <div class="atari-title">PAC-MENGÃO</div>
+      <div class="atari-desc">Come bandeirinhas tricolores pelo labirinto do CT Ninho do Urubu. Mengo Coin gigante transforma fantasmas — eles fogem quando a Nação canta o hino. Fase 2: labirinto do Maracanã com 4 saídas.</div>
+      <div class="atari-score">439.200</div>
+    </div>
+
+    <div class="atari-card">
+      <span class="atari-pixel-art">🔫🔴<br>⬛⬛⬛<br>🏹🏹🏹</span>
+      <div class="atari-original">Combat (1977)</div>
+      <div class="atari-title">MENGBAT: DÉRBI TOTAL</div>
+      <div class="atari-desc">Tanques rubro-negros vs tanques tricolores no campo de batalha pixelado do Clássico Carioca. Cada tiro é um chute de falta. Modo avião: helicópteros da torcida sobrevoam o Maracanã.</div>
+      <div class="atari-score">280.000</div>
+    </div>
+
+    <div class="atari-card">
+      <span class="atari-pixel-art">🏃🔴<br>⬛⬛⬛<br>🦁🦁🦁</span>
+      <div class="atari-original">Pitfall! (1982)</div>
+      <div class="atari-title">PITFALL RUBRO-NEGRO</div>
+      <div class="atari-desc">Gabigol corre pela floresta amazônica coletando Mengo Coins e evitando jacarés do Fluzão. Corda de balanço: a bandeira do Flamengo. Tesouro máximo: a taça enterrada na selva carioca.</div>
+      <div class="atari-score">314.000</div>
+    </div>
+
+    <div class="atari-card">
+      <span class="atari-pixel-art">⬛🔴⬛<br>🔴⬛🔴<br>⬛🔴⬛</span>
+      <div class="atari-original">Breakout (1976)</div>
+      <div class="atari-title">MENGOUT: BATE MURO</div>
+      <div class="atari-desc">Destrua os tijolos com a bola do Flamengo antes que acabe o tempo. Cada fileira de tijolos representa um rival carioca. Bola dourada especial: aparece quando você acumula 3 titles seguidos.</div>
+      <div class="atari-score">198.400</div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="reveal">
+    <div class="footer-brand">
+      SRN<span>X</span>
+      <span class="pixel-sub">GAMES FLAMENGUIZADOS · LEVEL 1</span>
+    </div>
+    <p style="font-size:0.85rem;color:var(--white-dim);margin-top:0.75rem;font-weight:300;line-height:1.6;max-width:480px">
+      Um universo de jogos reimaginados com a paixão rubro-negra. Cada jogo é uma missão épica no ecossistema SRNX — XP real, Mengo Coins reais, glória eterna.
+    </p>
+  </div>
+  <div class="reveal footer-meta">
+    <strong>SRNX · Game Lab</strong>
+    28 jogos flamenguizados<br>
+    5 plataformas · Era Pixel ao Next-Gen<br>
+    <br>
+    <span style="color:var(--pixel-green);font-family:'Press Start 2P',monospace;font-size:0.45rem">GAME OVER? NUNCA.</span><br>
+    <span style="color:var(--red)">Mengoooo! 🔴⚫</span>
+  </div>
+</footer>
+
+<script>
+// GTA Stars
+const starsEl = document.getElementById('gta-stars');
+if (starsEl) {
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 70 + '%';
+    s.style.animationDelay = Math.random() * 3 + 's';
+    starsEl.appendChild(s);
+  }
+}
+
+// GTA Street buildings
+const street = document.getElementById('gta-street');
+if (street) {
+  const heights = [50,35,70,28,55,40,80,32,60,45];
+  heights.forEach((h, i) => {
+    const b = document.createElement('div');
+    b.className = 'gta-building-s';
+    b.style.cssText = `width:${16+Math.random()*14}px;height:${h}px;flex-shrink:0;`;
+    if (i % 3 === 1) { b.style.background = '#8B0000'; b.style.borderTop = '2px solid #CC0000'; }
+    street.appendChild(b);
+  });
+}
+
+// Zelda dungeon map
+const dungeonMap = [
+  ['empty','empty','locked','empty','empty','empty','empty'],
+  ['empty','locked','room','room','room','empty','empty'],
+  ['room','room','current','room','boss','empty','empty'],
+  ['empty','empty','room','empty','treasure','empty','empty'],
+  ['empty','empty','room','room','room','empty','empty'],
+];
+const dungeonGrid = document.getElementById('dungeon-grid');
+if (dungeonGrid) {
+  const labels = { current:'⚔', boss:'💀', treasure:'💰', room:'', locked:'🔒' };
+  dungeonMap.forEach(row => {
+    row.forEach(cell => {
+      const d = document.createElement('div');
+      d.className = `d-room ${cell}`;
+      d.textContent = labels[cell] || '';
+      dungeonGrid.appendChild(d);
+    });
+  });
+}
+
+// Filter
+document.querySelectorAll('.filter-btn[data-plat]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn[data-plat]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const plat = btn.dataset.plat;
+    let count = 0;
+    document.querySelectorAll('.game-card[data-plat]').forEach(card => {
+      const show = plat === 'all' || card.dataset.plat === plat;
+      card.style.display = show ? '' : 'none';
+      if (show) count++;
+    });
+    const counterEl = document.getElementById('game-counter');
+    if (counterEl) counterEl.textContent = count + (count !== 1 ? ' JOGOS DISPONIVEIS' : ' JOGO DISPONIVEL');
+  });
+});
+
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+reveals.forEach(el => observer.observe(el));
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
