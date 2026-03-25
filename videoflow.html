@@ -1660,5 +1660,141 @@ function mountLLM() {
 // init
 document.querySelector('.nav-link.active') && null;
 </script>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SEÇÃO NOVA V3: ANIMAÇÃO DE IMAGENS — Middle Ground
+═══════════════════════════════════════════════════════ -->
+<div class="content-section" style="background:var(--paper)">
+  <div class="section-eyebrow">
+    <div class="eyebrow-line"></div>
+    <span class="eyebrow-num">Novo</span>
+    <span class="eyebrow-text">Animação de Imagens</span>
+  </div>
+  <h2>A camada <em>intermediária</em><br>que transforma qualquer foto em cena</h2>
+  <p class="lead" style="max-width:680px">Entre stock estático e geração de vídeo full existe um <strong>middle ground poderoso</strong> — animação de imagens a um custo 5–30× menor que geração de vídeo. O VideoFlow a utiliza como camada padrão para enriquecer produções sem explodir o orçamento.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:48px;margin-bottom:40px">
+    <div style="background:var(--white);border:1px solid #e8e3db;border-left:3px solid var(--accent);border-radius:8px;padding:24px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Parallax / 2.5D Depth</div>
+      <div style="font-size:20px;font-weight:600;color:var(--accent);letter-spacing:-.02em;margin-bottom:8px">~$0.01–0.05/clip</div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.65">Profundidade neural gerada a partir de 1 imagem. Efeito ken burns, dolly, órbita. Clip de 3–10s. Resultado cinematográfico a custo irrisório.</p>
+    </div>
+    <div style="background:var(--white);border:1px solid #e8e3db;border-left:3px solid var(--teal);border-radius:8px;padding:24px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Image-to-Video Curto (3–5s)</div>
+      <div style="font-size:20px;font-weight:600;color:var(--teal);letter-spacing:-.02em;margin-bottom:8px">~$0.09–0.25/clip</div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.65">A imagem "ganha vida" com movimento orgânico. Kling, Pika, Seedance para clips curtíssimos. 3–5× mais barato que geração de vídeo full.</p>
+    </div>
+    <div style="background:var(--white);border:1px solid #e8e3db;border-left:3px solid var(--green);border-radius:8px;padding:24px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Motion Design CSS/Remotion</div>
+      <div style="font-size:20px;font-weight:600;color:var(--green);letter-spacing:-.02em;margin-bottom:8px">$0.00/clip</div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.65">Animações CSS/SVG via Remotion ou Rive. Zoom, fade, slide, reveal sobre imagens estáticas. Custo zero — exige template pré-construído.</p>
+    </div>
+  </div>
+
+  <div style="background:var(--white);border:1px solid #e8e3db;border-radius:8px;padding:32px;margin-bottom:40px">
+    <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:20px">Pipeline de Assets do VideoFlow — Hierarquia de camadas</div>
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
+      <div style="padding:10px 16px;border-radius:6px;background:#f0ede8;border:1px solid #e3ddd3;font-size:12px;font-weight:500;color:var(--ink3);text-align:center">Stock Gratuito<br><span style="font-size:10px;font-weight:400">Pexels · Pixabay</span></div>
+      <span style="color:#b0ab9f;font-size:18px">→</span>
+      <div style="padding:10px 16px;border-radius:6px;background:#f0ede8;border:1px solid #e3ddd3;font-size:12px;font-weight:500;color:var(--ink3);text-align:center">Stock Pago<br><span style="font-size:10px;font-weight:400">Shutterstock · Adobe</span></div>
+      <span style="color:#b0ab9f;font-size:18px">→</span>
+      <div style="padding:10px 16px;border-radius:6px;background:rgba(30,64,232,.06);border:2px solid rgba(30,64,232,.25);font-size:13px;font-weight:600;color:var(--accent);text-align:center">✨ Animação de Imagem<br><span style="font-size:10px;font-weight:400">Parallax · I2V · CSS</span></div>
+      <span style="color:#b0ab9f;font-size:18px">→</span>
+      <div style="padding:10px 16px;border-radius:6px;background:#f0ede8;border:1px solid #e3ddd3;font-size:12px;font-weight:500;color:var(--ink3);text-align:center">Geração AI<br><span style="font-size:10px;font-weight:400">Nano Banana · Flux</span></div>
+      <span style="color:#b0ab9f;font-size:18px">→</span>
+      <div style="padding:10px 16px;border-radius:6px;background:#f0ede8;border:1px solid #e3ddd3;font-size:12px;font-weight:500;color:var(--ink3);text-align:center">Geração Vídeo AI<br><span style="font-size:10px;font-weight:400">Runway · Veo 3</span></div>
+    </div>
+    <p style="margin-top:16px;font-size:13px;color:var(--ink3);line-height:1.65">Com esta estratégia de camadas, <strong style="color:var(--ink)">apenas 1 de cada 6 cenas</strong> precisa de geração de vídeo full — redução de até <strong style="color:var(--green)">82% no custo de assets de movimento</strong> comparado a gerar vídeo para todas as cenas.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SEÇÃO NOVA V3: VIDEOROBOT
+═══════════════════════════════════════════════════════ -->
+<div class="content-section dark">
+  <div class="section-eyebrow">
+    <div class="eyebrow-line"></div>
+    <span class="eyebrow-num">Novo</span>
+    <span class="eyebrow-text">VideoRobot</span>
+  </div>
+  <h2>O Diretor de Arte<br>que <em>escuta antes de criar</em></h2>
+  <p class="lead" style="max-width:680px">VideoRobot é a interface de entrada do VideoFlow — onde o usuário conversa com o Diretor de Arte artificial para transformar referências brutas em uma Ordem de Produção estruturada e acionável. 4 fases de co-criação com IA real.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:48px">
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:28px 24px;position:relative">
+      <div style="font-size:48px;font-family:var(--font-serif);font-weight:800;color:rgba(255,255,255,.06);position:absolute;top:16px;right:20px;line-height:1">01</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(180,196,255,.6);margin-bottom:10px">Fase 01</div>
+      <div style="font-family:var(--font-serif);font-size:18px;font-weight:700;color:white;margin-bottom:10px">Elementos &amp; Instruções</div>
+      <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.65">Upload de imagens e vídeos. Tags semânticas por arquivo. Instruções individuais. Parâmetros rápidos de produção.</p>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:28px 24px;position:relative">
+      <div style="font-size:48px;font-family:var(--font-serif);font-weight:800;color:rgba(255,255,255,.06);position:absolute;top:16px;right:20px;line-height:1">02</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(180,196,255,.6);margin-bottom:10px">Fase 02</div>
+      <div style="font-family:var(--font-serif);font-size:18px;font-weight:700;color:white;margin-bottom:10px">Conferência com o DA</div>
+      <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.65">O DA analisa o material e apresenta sua leitura. Chat bidirecional para refinamento antes de avançar.</p>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:28px 24px;position:relative">
+      <div style="font-size:48px;font-family:var(--font-serif);font-weight:800;color:rgba(255,255,255,.06);position:absolute;top:16px;right:20px;line-height:1">03</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(180,196,255,.6);margin-bottom:10px">Fase 03</div>
+      <div style="font-family:var(--font-serif);font-size:18px;font-weight:700;color:white;margin-bottom:10px">BrainStorm Criativo</div>
+      <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.65">4 conceitos propostos com nome, narrativa e arco emocional. Parâmetros de estilo, ritmo e paleta configurados.</p>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:28px 24px;position:relative">
+      <div style="font-size:48px;font-family:var(--font-serif);font-weight:800;color:rgba(255,255,255,.06);position:absolute;top:16px;right:20px;line-height:1">04</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(180,196,255,.6);margin-bottom:10px">Fase 04</div>
+      <div style="font-family:var(--font-serif);font-size:18px;font-weight:700;color:white;margin-bottom:10px">Ordem de Produção</div>
+      <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.65">JSON estruturado com briefing, conceito, diretrizes do DA, cenas-chave, sugestão musical. Enviado para a fila.</p>
+    </div>
+  </div>
+
+  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:28px;margin-top:40px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px">Multi-LLM Configurável</div>
+    <p style="font-size:15px;color:rgba(255,255,255,.65);line-height:1.75;max-width:800px">
+      VideoRobot é agnóstico de provedor LLM. Suporte built-in a <strong style="color:white">Anthropic Claude, OpenAI GPT-4o, Google Gemini e MiniMax</strong>. Adicione qualquer provedor via URL OpenAI-compatible: Groq, Together AI, DeepSeek, Ollama local — com gestão de API keys, seleção de modelos e teste de conexão em tempo real.
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SEÇÃO NOVA V3: SIMULADOR
+═══════════════════════════════════════════════════════ -->
+<div class="content-section">
+  <div class="section-eyebrow">
+    <div class="eyebrow-line"></div>
+    <span class="eyebrow-num">Novo</span>
+    <span class="eyebrow-text">Simulador de Custos v2</span>
+  </div>
+  <h2>O simulador que<br><em>torna o custo tangível</em></h2>
+  <p class="lead" style="max-width:680px">6 abas interativas para explorar cada dimensão de custo do VideoFlow. De modelos LLM a provedores de stock, animação de imagens, geração AI e simulação completa por vídeo — com breakdown em tempo real.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px;margin-bottom:32px">
+    <div style="background:var(--white);border:1px solid #e8e3db;border-radius:8px;padding:20px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Aba 1 — Modelos LLM</div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6">Comparativo de custo entre Anthropic, Google, MiniMax e modelos alternativos. 4 cenários de stack.</p>
+    </div>
+    <div style="background:var(--white);border:1px solid #e8e3db;border-radius:8px;padding:20px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Aba 2 — Stock Providers</div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6">Preços reais de Pexels, Pixabay, Shutterstock, Adobe Stock, Getty. Calculadora de break-even por volume.</p>
+    </div>
+    <div style="background:var(--white);border:1px solid rgba(30,64,232,.2);border-radius:8px;padding:20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:8px;right:8px;font-size:9px;font-weight:700;letter-spacing:.1em;padding:2px 6px;background:rgba(30,64,232,.1);color:var(--accent);border-radius:3px">NOVO</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Aba 3 — Animação de Imagens</div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6">Tabelas de Parallax/2.5D, Image-to-Video e Motion CSS. Calculadora de custo vs qualidade vs economia.</p>
+    </div>
+    <div style="background:var(--white);border:1px solid #e8e3db;border-radius:8px;padding:20px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Aba 4 — Geração AI</div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6">Nano Banana, DALL-E 3, Flux, Runway Gen-4, Veo 3. Calculadora de custo por job com cenários de gap.</p>
+    </div>
+    <div style="background:var(--white);border:1px solid #e8e3db;border-radius:8px;padding:20px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Aba 5 — Cenários Combinados</div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6">4 stacks de custo (Budget → Premium) com custo por vídeo, por minuto e projeção mensal.</p>
+    </div>
+    <div style="background:var(--white);border:1px solid #e8e3db;border-radius:8px;padding:20px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Aba 6 — Simulador por Vídeo</div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6">Simulação completa com todos os parâmetros: LLM, stock, animação, geração AI. Breakdown detalhado por componente.</p>
+    </div>
+  </div>
+</div>
 </body>
 </html>

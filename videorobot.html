@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VideoRobot — Conceito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --noir:#09090b;--noir2:#18181b;--noir3:#27272a;--noir4:#3f3f46;
+  --zinc:#71717a;--zinc2:#a1a1aa;--zinc3:#d4d4d8;--zinc4:#f4f4f5;
+  --white:#fafafa;--paper:#f0ede8;
+  --red:#dc2626;--red2:#ef4444;--redglow:rgba(220,38,38,.15);
+  --gold:#ca8a04;--gold2:#fbbf24;--goldglow:rgba(251,191,36,.12);
+  --teal:#0d9488;--tealglow:rgba(13,148,136,.12);
+  --display:"Playfair Display",Georgia,serif;
+  --body:"Barlow",system-ui,sans-serif;
+  --cond:"Barlow Condensed",system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);background:var(--noir);color:var(--white);
+  font-size:16px;line-height:1.7;font-weight:300;
+  -webkit-font-smoothing:antialiased;
+  cursor:default;
+}
+
+/* ── GRAIN ── */
+body::before{
+  content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--noir)}
+::-webkit-scrollbar-thumb{background:var(--noir4)}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:80px 40px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%,rgba(220,38,38,.08) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 40% at 20% 80%,rgba(13,148,136,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 30% at 80% 20%,rgba(202,138,4,.05) 0%,transparent 60%);
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 70% 60% at 50% 50%,black,transparent);
+}
+.hero-eyebrow{
+  font-family:var(--cond);font-size:12px;font-weight:600;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--red2);
+  margin-bottom:32px;display:flex;align-items:center;gap:12px;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{
+  content:"";width:40px;height:1px;background:var(--red2);opacity:.5;
+}
+.hero-kicker{
+  font-family:var(--cond);font-size:clamp(11px,1.2vw,13px);font-weight:400;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--zinc);
+  margin-bottom:24px;
+}
+.hero-title{
+  font-family:var(--display);font-size:clamp(56px,8vw,110px);
+  font-weight:900;letter-spacing:-.03em;line-height:.9;
+  color:var(--white);margin-bottom:8px;
+}
+.hero-title em{color:var(--red2);font-style:italic}
+.hero-sub{
+  font-family:var(--display);font-size:clamp(20px,2.5vw,32px);
+  font-weight:400;font-style:italic;color:var(--zinc2);
+  margin-bottom:48px;letter-spacing:-.01em;
+}
+.hero-desc{
+  max-width:620px;font-size:clamp(15px,1.6vw,17px);color:var(--zinc2);
+  line-height:1.75;font-weight:300;margin-bottom:64px;
+}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:80px}
+.chip{
+  font-family:var(--cond);font-size:11px;font-weight:600;letter-spacing:.15em;
+  text-transform:uppercase;padding:7px 16px;border-radius:2px;
+  border:1px solid;
+}
+.chip-r{border-color:rgba(220,38,38,.3);color:var(--red2);background:rgba(220,38,38,.05)}
+.chip-g{border-color:rgba(13,148,136,.3);color:var(--teal);background:rgba(13,148,136,.05)}
+.chip-y{border-color:rgba(202,138,4,.3);color:var(--gold2);background:rgba(202,138,4,.05)}
+.hero-scroll{
+  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+  font-family:var(--cond);font-size:10px;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--noir4);display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.hero-scroll::after{
+  content:"";width:1px;height:48px;background:linear-gradient(var(--noir4),transparent);
+  animation:scrollpulse 2s infinite;
+}
+@keyframes scrollpulse{0%,100%{opacity:.3;transform:scaleY(1)}50%{opacity:.8;transform:scaleY(.7)}}
+
+/* ── SECTIONS ── */
+section{padding:120px 40px;max-width:1200px;margin:0 auto;position:relative}
+section.full-bleed{max-width:none;padding-left:0;padding-right:0}
+.section-num{
+  font-family:var(--cond);font-size:11px;font-weight:600;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--red2);margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.section-num::before{content:attr(data-n);font-size:48px;font-family:var(--display);
+  color:var(--noir3);line-height:1;margin-right:4px}
+.section-title{
+  font-family:var(--display);font-size:clamp(32px,4vw,56px);
+  font-weight:700;letter-spacing:-.03em;line-height:1.05;
+  margin-bottom:24px;
+}
+.section-title em{color:var(--red2);font-style:italic}
+.section-lead{
+  font-size:clamp(16px,1.6vw,19px);color:var(--zinc2);line-height:1.8;
+  max-width:680px;font-weight:300;margin-bottom:64px;
+}
+
+/* ── RULE ── */
+.rule{
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--noir3) 20%,var(--noir3) 80%,transparent);
+  margin:0;
+}
+.rule-full{background:linear-gradient(90deg,transparent,var(--noir3) 5%,var(--noir3) 95%,transparent)}
+
+/* ── THE CONCEPT ── */
+.concept-statement{
+  font-family:var(--display);font-size:clamp(22px,3vw,38px);
+  font-style:italic;font-weight:400;line-height:1.4;letter-spacing:-.02em;
+  color:var(--white);border-left:2px solid var(--red2);padding-left:32px;
+  margin-bottom:48px;
+}
+.concept-statement em{color:var(--red2);font-style:normal}
+
+/* ── 4 PHASES ── */
+.phases{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:80px}
+@media(max-width:700px){.phases{grid-template-columns:1fr}}
+.phase-card{
+  background:var(--noir2);padding:48px 40px;position:relative;
+  transition:background .25s;overflow:hidden;
+}
+.phase-card::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--redglow) 0%,transparent 60%);
+  opacity:0;transition:opacity .3s;
+}
+.phase-card:hover{background:var(--noir3)}
+.phase-card:hover::before{opacity:1}
+.phase-n{
+  font-family:var(--display);font-size:80px;font-weight:900;
+  color:var(--noir3);line-height:1;position:absolute;top:24px;right:32px;
+  transition:color .25s;
+}
+.phase-card:hover .phase-n{color:var(--noir4)}
+.phase-eyebrow{
+  font-family:var(--cond);font-size:10px;font-weight:600;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--red2);margin-bottom:12px;
+}
+.phase-title{
+  font-family:var(--display);font-size:clamp(20px,2.2vw,28px);
+  font-weight:700;letter-spacing:-.02em;margin-bottom:16px;color:var(--white);
+}
+.phase-desc{font-size:14px;color:var(--zinc2);line-height:1.75;max-width:340px}
+.phase-items{margin-top:24px;display:flex;flex-direction:column;gap:8px}
+.phase-item{
+  display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--zinc2);
+}
+.phase-item::before{
+  content:"→";color:var(--red2);flex-shrink:0;font-size:12px;margin-top:2px;
+  font-family:var(--cond);
+}
+.phase-item strong{color:var(--white);font-weight:500}
+
+/* ── FLOW DIAGRAM ── */
+.flow{
+  background:var(--noir2);border:1px solid var(--noir3);border-radius:0;
+  padding:56px;margin-bottom:80px;
+}
+.flow-title{
+  font-family:var(--cond);font-size:11px;font-weight:600;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--zinc);margin-bottom:48px;
+  text-align:center;
+}
+.flow-steps{display:flex;align-items:stretch;justify-content:center;gap:0;flex-wrap:wrap}
+.flow-step{
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 24px;position:relative;
+}
+.flow-step:not(:last-child)::after{
+  content:"→";position:absolute;right:-12px;top:28px;
+  font-size:20px;color:var(--noir4);font-family:var(--cond);
+}
+.flow-icon{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--noir3);border:1px solid var(--noir4);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  margin-bottom:12px;
+}
+.flow-step-lbl{
+  font-family:var(--cond);font-size:10px;font-weight:600;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--zinc2);text-align:center;
+}
+.flow-step-sub{font-size:11px;color:var(--zinc);text-align:center;margin-top:3px}
+
+/* ── DA FEATURES ── */
+.da-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:80px}
+@media(max-width:900px){.da-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.da-grid{grid-template-columns:1fr}}
+.da-card{
+  border:1px solid var(--noir3);padding:32px 28px;position:relative;
+  transition:border-color .2s,transform .2s;
+}
+.da-card:hover{border-color:var(--noir4);transform:translateY(-2px)}
+.da-card-ico{font-size:28px;margin-bottom:16px;display:block}
+.da-card-title{
+  font-family:var(--display);font-size:17px;font-weight:700;
+  letter-spacing:-.01em;color:var(--white);margin-bottom:8px;
+}
+.da-card-desc{font-size:13px;color:var(--zinc2);line-height:1.7}
+
+/* ── MULTI-LLM ── */
+.llm-band{
+  background:var(--noir2);padding:80px 40px;
+  border-top:1px solid var(--noir3);border-bottom:1px solid var(--noir3);
+  margin-bottom:0;
+}
+.llm-inner{max-width:1200px;margin:0 auto}
+.llm-providers{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:48px}
+@media(max-width:800px){.llm-providers{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.llm-providers{grid-template-columns:1fr}}
+.llm-card{
+  border:1px solid var(--noir3);padding:28px 24px;
+  transition:border-color .2s;
+}
+.llm-card:hover{border-color:var(--noir4)}
+.llm-badge{
+  font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;padding:3px 9px;margin-bottom:14px;
+  display:inline-block;
+}
+.llm-name{font-family:var(--display);font-size:18px;font-weight:700;
+  color:var(--white);margin-bottom:8px;letter-spacing:-.01em}
+.llm-models{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.llm-model{
+  font-family:var(--cond);font-size:10px;letter-spacing:.06em;
+  padding:3px 8px;border:1px solid var(--noir4);color:var(--zinc2);
+}
+.llm-desc{font-size:12px;color:var(--zinc);line-height:1.6;margin-top:10px}
+.llm-custom{
+  grid-column:1/-1;background:linear-gradient(135deg,rgba(202,138,4,.06) 0%,transparent 60%);
+  border-color:rgba(202,138,4,.2);
+}
+.llm-custom .llm-name{color:var(--gold2)}
+
+/* ── OUTPUT ── */
+.output-section{
+  padding:120px 40px;
+  background:linear-gradient(180deg,transparent 0%,rgba(220,38,38,.04) 50%,transparent 100%);
+}
+.output-inner{max-width:1200px;margin:0 auto}
+.output-card{
+  background:var(--noir2);border:1px solid var(--noir3);
+  padding:48px;margin-bottom:2px;display:flex;align-items:flex-start;gap:32px;
+}
+.output-card-ico{
+  width:56px;height:56px;background:var(--noir3);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+}
+.output-card-label{
+  font-family:var(--cond);font-size:10px;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--red2);margin-bottom:8px;
+}
+.output-card-title{
+  font-family:var(--display);font-size:clamp(18px,2vw,24px);font-weight:700;
+  color:var(--white);letter-spacing:-.02em;margin-bottom:10px;
+}
+.output-card-desc{font-size:14px;color:var(--zinc2);line-height:1.75;max-width:680px}
+.output-card-fields{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.output-field{
+  font-family:var(--cond);font-size:10px;padding:4px 10px;
+  background:var(--noir3);color:var(--zinc2);letter-spacing:.06em;
+}
+
+/* ── JSON PREVIEW ── */
+.json-preview{
+  background:var(--noir);border:1px solid var(--noir3);
+  padding:32px 36px;font-family:"Courier New",monospace;font-size:12px;
+  line-height:1.8;color:var(--zinc2);margin-top:48px;overflow-x:auto;
+  position:relative;
+}
+.json-preview::before{
+  content:"production_order.json";
+  position:absolute;top:12px;right:16px;
+  font-family:var(--cond);font-size:9px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--noir4);
+}
+.json-k{color:var(--zinc3)}
+.json-s{color:var(--red2)}
+.json-n{color:var(--gold2)}
+.json-b{color:var(--teal)}
+
+/* ── TECH ── */
+.tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:80px}
+@media(max-width:700px){.tech-grid{grid-template-columns:1fr}}
+.tech-cell{background:var(--noir2);padding:40px;border-bottom:1px solid var(--noir3)}
+.tech-cell-label{
+  font-family:var(--cond);font-size:10px;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--zinc);margin-bottom:16px;
+}
+.tech-cell-val{
+  font-family:var(--display);font-size:clamp(18px,2vw,24px);
+  font-weight:700;color:var(--white);letter-spacing:-.02em;margin-bottom:10px;
+}
+.tech-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tech-tag{
+  font-family:var(--cond);font-size:10px;letter-spacing:.08em;
+  padding:4px 10px;border:1px solid var(--noir4);color:var(--zinc2);
+}
+
+/* ── DIVIDER BIG TEXT ── */
+.divider-text{
+  padding:80px 40px;text-align:center;overflow:hidden;position:relative;
+}
+.divider-text h2{
+  font-family:var(--display);font-size:clamp(40px,8vw,100px);font-weight:900;
+  font-style:italic;letter-spacing:-.04em;line-height:.9;
+  color:transparent;-webkit-text-stroke:1px var(--noir3);
+}
+.divider-text h2 em{-webkit-text-stroke:1px rgba(220,38,38,.3);color:transparent}
+
+/* ── FOOTER ── */
+footer{
+  padding:64px 40px;border-top:1px solid var(--noir3);
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;
+}
+.footer-logo{
+  font-family:var(--display);font-size:28px;font-weight:900;
+  letter-spacing:-.03em;color:var(--white);
+}
+.footer-logo em{color:var(--red2);font-style:italic}
+.footer-meta{font-family:var(--cond);font-size:11px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--zinc)}
+
+/* ── ANIMATE ON SCROLL ── */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.reveal.on{opacity:1;transform:none}
+.reveal-d1{transition-delay:.1s}
+.reveal-d2{transition-delay:.2s}
+.reveal-d3{transition-delay:.3s}
+.reveal-d4{transition-delay:.4s}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div style="position:relative;z-index:1">
+    <div class="hero-eyebrow">VideoFlow · Módulo de Entrada</div>
+    <div class="hero-kicker">Interface de Colaboração Humano–IA</div>
+    <h1 class="hero-title">Video<em>Robot</em></h1>
+    <div class="hero-sub">O Diretor de Arte que escuta antes de criar</div>
+    <p class="hero-desc">
+      VideoRobot é a interface de entrada do VideoFlow — onde o usuário conversa com um Diretor de Arte artificial para transformar referências brutas em uma Ordem de Produção estruturada, rica e acionável.
+    </p>
+    <div class="hero-chips">
+      <span class="chip chip-r">4 Fases de Co-criação</span>
+      <span class="chip chip-g">Multi-LLM Configurável</span>
+      <span class="chip chip-y">Ordem de Produção JSON</span>
+      <span class="chip chip-r">Direção de Arte Real</span>
+      <span class="chip chip-g">Upload de Referências</span>
+      <span class="chip chip-y">BrainStorm Assistido</span>
+    </div>
+  </div>
+  <div class="hero-scroll">Descer</div>
+</div>
+
+<div class="rule"></div>
+
+<!-- ═══════════════ O QUE É ═══════════════ -->
+<section>
+  <div class="section-num" data-n="01">Conceito</div>
+  <h2 class="section-title reveal">O problema que<br><em>VideoRobot resolve</em></h2>
+  <p class="section-lead reveal reveal-d1">
+    Produção de vídeo autônoma precisa de contexto humano para funcionar bem. Um briefing textual nunca captura completamente a visão do criador. VideoRobot resolve isso transformando a entrada em um processo colaborativo de 4 fases — onde o DA artificial escuta, questiona, propõe e documenta antes de qualquer pixel ser renderizado.
+  </p>
+
+  <div class="concept-statement reveal reveal-d2">
+    VideoRobot não é um formulário.<br>
+    É uma <em>conversa de briefing</em> com memória,<br>intuição visual e capacidade de proposta criativa.
+  </div>
+
+  <div class="da-grid">
+    <div class="da-card reveal reveal-d1">
+      <span class="da-card-ico">📁</span>
+      <div class="da-card-title">Upload de Referências</div>
+      <div class="da-card-desc">Imagens e vídeos reais do cliente — produtos, locais, pessoas, identidade visual. O DA vê, analisa e extrai intenção de cada elemento.</div>
+    </div>
+    <div class="da-card reveal reveal-d2">
+      <span class="da-card-ico">🎯</span>
+      <div class="da-card-title">Instruções por Elemento</div>
+      <div class="da-card-desc">Cada arquivo recebe tags semânticas e instruções individuais: "abertura", "b-roll", "destaque", "logo". O DA interpreta o papel de cada peça.</div>
+    </div>
+    <div class="da-card reveal reveal-d3">
+      <span class="da-card-ico">🎬</span>
+      <div class="da-card-title">Conferência Dialogada</div>
+      <div class="da-card-desc">O DA apresenta sua leitura do material e abre espaço para correções. Chat bidirecional até o usuário confirmar que o DA entendeu a intenção.</div>
+    </div>
+    <div class="da-card reveal reveal-d1">
+      <span class="da-card-ico">💡</span>
+      <div class="da-card-title">BrainStorm de Conceitos</div>
+      <div class="da-card-desc">4 conceitos criativos distintos propostos com nome, narrativa, arco emocional e uso específico de cada elemento. O usuário escolhe, mescla ou pede variações.</div>
+    </div>
+    <div class="da-card reveal reveal-d2">
+      <span class="da-card-ico">⚙️</span>
+      <div class="da-card-title">Parâmetros Visuais</div>
+      <div class="da-card-desc">Estilo visual, paleta cromática, ritmo de edição, intensidade emocional, presença de narração. Configurados com precisão antes da ordem de produção.</div>
+    </div>
+    <div class="da-card reveal reveal-d3">
+      <span class="da-card-ico">📄</span>
+      <div class="da-card-title">Ordem de Produção</div>
+      <div class="da-card-desc">JSON estruturado com conceito, briefing, cenas-chave, uso de cada elemento, diretrizes do DA, sugestão musical. Pronto para o VideoFlow processar.</div>
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ═══════════════ 4 FASES ═══════════════ -->
+<section style="padding-bottom:0">
+  <div class="section-num" data-n="02">Processo</div>
+  <h2 class="section-title reveal">4 Fases de<br><em>Co-criação</em></h2>
+  <p class="section-lead reveal reveal-d1">
+    Da referência bruta à ordem de produção, VideoRobot conduz o usuário por quatro fases progressivas — cada uma construindo sobre a anterior, cada uma com IA real no loop.
+  </p>
+</section>
+
+<div class="phases">
+  <div class="phase-card reveal">
+    <div class="phase-n">01</div>
+    <div class="phase-eyebrow">Fase 01 · Coleta</div>
+    <div class="phase-title">Elementos &amp; Instruções</div>
+    <div class="phase-desc">Upload de referências visuais com contexto semântico por peça.</div>
+    <div class="phase-items">
+      <div class="phase-item"><strong>Drag &amp; drop</strong> de imagens e vídeos</div>
+      <div class="phase-item"><strong>Quick tags</strong> por elemento (Abertura, Logo, B-Roll…)</div>
+      <div class="phase-item"><strong>Instruções textuais</strong> por arquivo</div>
+      <div class="phase-item"><strong>Parâmetros rápidos</strong>: canal, duração, tom, público</div>
+    </div>
+  </div>
+  <div class="phase-card reveal reveal-d1">
+    <div class="phase-n">02</div>
+    <div class="phase-eyebrow">Fase 02 · Revisão</div>
+    <div class="phase-title">Conferência com o DA</div>
+    <div class="phase-desc">O DA analisa todo o material e apresenta sua leitura inicial para validação.</div>
+    <div class="phase-items">
+      <div class="phase-item"><strong>Análise AI</strong> de cada elemento enviado</div>
+      <div class="phase-item"><strong>Chat bidirecional</strong> para ajustes de interpretação</div>
+      <div class="phase-item"><strong>Extração automática</strong> de tags e intenções</div>
+      <div class="phase-item"><strong>Confirmação</strong> antes de avançar</div>
+    </div>
+  </div>
+  <div class="phase-card reveal reveal-d2">
+    <div class="phase-n">03</div>
+    <div class="phase-eyebrow">Fase 03 · Criação</div>
+    <div class="phase-title">BrainStorm Criativo</div>
+    <div class="phase-desc">4 conceitos propostos pelo DA. O usuário escolhe, refina e define parâmetros.</div>
+    <div class="phase-items">
+      <div class="phase-item"><strong>4 conceitos</strong> com nome e narrativa distintos</div>
+      <div class="phase-item"><strong>Sliders</strong> de ritmo e intensidade emocional</div>
+      <div class="phase-item"><strong>Seletor de paleta</strong> cromática e estilo visual</div>
+      <div class="phase-item"><strong>Chat de refinamento</strong> pós-seleção</div>
+    </div>
+  </div>
+  <div class="phase-card reveal reveal-d3">
+    <div class="phase-n">04</div>
+    <div class="phase-eyebrow">Fase 04 · Entrega</div>
+    <div class="phase-title">Ordem de Produção</div>
+    <div class="phase-desc">Documento JSON completo pronto para injeção na fila do VideoFlow.</div>
+    <div class="phase-items">
+      <div class="phase-item"><strong>Briefing + conceito</strong> estruturado</div>
+      <div class="phase-item"><strong>Diretrizes do DA</strong> completas</div>
+      <div class="phase-item"><strong>Cenas-chave</strong> descritas e ordenadas</div>
+      <div class="phase-item"><strong>Estimativa de custo</strong> por componente</div>
+    </div>
+  </div>
+</div>
+
+<div style="height:2px;background:var(--noir3);margin:0"></div>
+
+<!-- ═══════════════ FLOW ═══════════════ -->
+<section>
+  <div class="flow reveal">
+    <div class="flow-title">Fluxo de dados: do upload à fila de produção</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-icon">📁</div>
+        <div class="flow-step-lbl">Upload</div>
+        <div class="flow-step-sub">Imagens & vídeos</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-icon">🏷️</div>
+        <div class="flow-step-lbl">Tags & Instr.</div>
+        <div class="flow-step-sub">Por elemento</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-icon">🎬</div>
+        <div class="flow-step-lbl">Conferência</div>
+        <div class="flow-step-sub">Chat com DA</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-icon">💡</div>
+        <div class="flow-step-lbl">BrainStorm</div>
+        <div class="flow-step-sub">4 conceitos</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-icon">⚙️</div>
+        <div class="flow-step-lbl">Parâmetros</div>
+        <div class="flow-step-sub">Estilo & ritmo</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-icon">📄</div>
+        <div class="flow-step-lbl">Ordem JSON</div>
+        <div class="flow-step-sub">Para o VideoFlow</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-icon">🚀</div>
+        <div class="flow-step-lbl">Fila</div>
+        <div class="flow-step-sub">Produção inicia</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSON Preview -->
+  <div class="json-preview reveal">
+<span class="json-b">{</span>
+  <span class="json-k">"id"</span>: <span class="json-s">"VR-847291"</span>,
+  <span class="json-k">"job_title"</span>: <span class="json-s">"Lançamento Produto — Institucional LinkedIn"</span>,
+  <span class="json-k">"objective"</span>: <span class="json-s">"Apresentar o novo produto para gestores B2B com tom aspiracional"</span>,
+  <span class="json-k">"creative_concept"</span>: <span class="json-b">{</span>
+    <span class="json-k">"name"</span>: <span class="json-s">"Precisão em Movimento"</span>,
+    <span class="json-k">"narrative"</span>: <span class="json-s">"Câmera lenta sobre detalhes do produto, seguida de corte para uso real"</span>,
+    <span class="json-k">"emotional_arc"</span>: <span class="json-s">"Curiosidade → Admiração → Confiança"</span>
+  <span class="json-b">}</span>,
+  <span class="json-k">"production_params"</span>: <span class="json-b">{</span>
+    <span class="json-k">"visual_style"</span>: <span class="json-s">"Cinematográfico"</span>,
+    <span class="json-k">"color_palette"</span>: <span class="json-s">"Natural frio"</span>,
+    <span class="json-k">"editing_rhythm"</span>: <span class="json-s">"Médio"</span>,
+    <span class="json-k">"emotional_intensity"</span>: <span class="json-n">4</span>
+  <span class="json-b">}</span>,
+  <span class="json-k">"da_directives"</span>: <span class="json-s">"Priorizar a textura do produto nos primeiros 8 segundos..."</span>,
+  <span class="json-k">"key_scenes"</span>: <span class="json-b">[</span><span class="json-s">"Abertura close produto"</span>, <span class="json-s">"Uso em contexto real"</span>, <span class="json-s">"Logo + CTA"</span><span class="json-b">]</span>,
+  <span class="json-k">"estimated_cost"</span>: <span class="json-n">0.0847</span>
+<span class="json-b">}</span>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ═══════════════ MULTI-LLM ═══════════════ -->
+<div class="llm-band">
+  <div class="llm-inner">
+    <div class="section-num" data-n="03">Arquitetura</div>
+    <h2 class="section-title reveal">Agnóstico de<br><em>Provedor LLM</em></h2>
+    <p class="section-lead reveal reveal-d1">
+      VideoRobot não amarra o usuário a nenhum modelo específico. Um roteador interno direciona cada chamada para o provedor configurado — com suporte a provedores personalizados via URL OpenAI-compatible.
+    </p>
+    <div class="llm-providers">
+      <div class="llm-card reveal">
+        <span class="llm-badge" style="background:rgba(217,119,6,.1);color:#fbbf24;border:1px solid rgba(217,119,6,.2)">Built-in</span>
+        <div class="llm-name">Anthropic</div>
+        <div class="llm-desc">Melhor raciocínio criativo. Recomendado para o papel de Diretor de Arte.</div>
+        <div class="llm-models">
+          <span class="llm-model">claude-sonnet-4-6</span>
+          <span class="llm-model">claude-opus-4-5</span>
+          <span class="llm-model">claude-haiku-4-5</span>
+        </div>
+      </div>
+      <div class="llm-card reveal reveal-d1">
+        <span class="llm-badge" style="background:rgba(16,185,129,.1);color:#34d399;border:1px solid rgba(16,185,129,.2)">Built-in</span>
+        <div class="llm-name">OpenAI</div>
+        <div class="llm-desc">GPT-4o com visão nativa. Boa alternativa com análise multimodal.</div>
+        <div class="llm-models">
+          <span class="llm-model">gpt-4o</span>
+          <span class="llm-model">gpt-4o-mini</span>
+          <span class="llm-model">o3-mini</span>
+        </div>
+      </div>
+      <div class="llm-card reveal reveal-d2">
+        <span class="llm-badge" style="background:rgba(77,143,255,.1);color:#93c5fd;border:1px solid rgba(77,143,255,.2)">Built-in</span>
+        <div class="llm-name">Google Gemini</div>
+        <div class="llm-desc">Multimodal nativo. Excelente para análise de imagens e vídeos de referência.</div>
+        <div class="llm-models">
+          <span class="llm-model">gemini-2.5-flash</span>
+          <span class="llm-model">gemini-2.5-pro</span>
+        </div>
+      </div>
+      <div class="llm-card reveal reveal-d3">
+        <span class="llm-badge" style="background:rgba(192,56,32,.1);color:#fca5a5;border:1px solid rgba(192,56,32,.2)">Built-in</span>
+        <div class="llm-name">MiniMax</div>
+        <div class="llm-desc">Custo ultra-baixo, alta velocidade. Ideal para produção em alto volume.</div>
+        <div class="llm-models">
+          <span class="llm-model">minimax-m2.5</span>
+          <span class="llm-model">minimax-m2.7</span>
+        </div>
+      </div>
+      <div class="llm-card llm-custom reveal">
+        <span class="llm-badge" style="background:rgba(202,138,4,.1);color:var(--gold2);border:1px solid rgba(202,138,4,.25)">Personalizado</span>
+        <div class="llm-name" style="color:var(--gold2)">Qualquer API OpenAI-compatible</div>
+        <div class="llm-desc">Groq, Together AI, Ollama (local), DeepSeek, Perplexity, Fireworks — qualquer endpoint com formato OpenAI. Configure URL, API key e modelos disponíveis. Salvo em localStorage.</div>
+        <div class="llm-models">
+          <span class="llm-model" style="border-color:rgba(202,138,4,.2)">llama-3.3-70b</span>
+          <span class="llm-model" style="border-color:rgba(202,138,4,.2)">deepseek-r1</span>
+          <span class="llm-model" style="border-color:rgba(202,138,4,.2)">mixtral-8x7b</span>
+          <span class="llm-model" style="border-color:rgba(202,138,4,.2)">qualquer modelo…</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ OUTPUT ═══════════════ -->
+<div class="output-section">
+  <div class="output-inner">
+    <div class="section-num" data-n="04">Output</div>
+    <h2 class="section-title reveal">O que o VideoFlow<br><em>recebe da Ordem</em></h2>
+    <p class="section-lead reveal reveal-d1">
+      A Ordem de Produção é o contrato entre o VideoRobot e o VideoFlow. Um JSON estruturado que carrega tudo que os 6 agentes de produção precisam para operar com autonomia e fidelidade à intenção original.
+    </p>
+
+    <div class="output-card reveal">
+      <div class="output-card-ico">🎯</div>
+      <div>
+        <div class="output-card-label">Seção 1</div>
+        <div class="output-card-title">Briefing &amp; Objetivo</div>
+        <div class="output-card-desc">Contexto completo do job: título, objetivo, público-alvo, canal de destino, duração alvo. É o norte que guia todas as decisões dos agentes downstream.</div>
+        <div class="output-card-fields">
+          <span class="output-field">job_title</span><span class="output-field">objective</span><span class="output-field">target_audience</span><span class="output-field">channel</span><span class="output-field">duration</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="output-card reveal reveal-d1">
+      <div class="output-card-ico">🎨</div>
+      <div>
+        <div class="output-card-label">Seção 2</div>
+        <div class="output-card-title">Conceito Criativo</div>
+        <div class="output-card-desc">O conceito escolhido com nome, descrição narrativa completa, abordagem visual e arco emocional do vídeo. É o vetor de DA que impregna todo o pipeline de produção.</div>
+        <div class="output-card-fields">
+          <span class="output-field">concept.name</span><span class="output-field">concept.narrative</span><span class="output-field">visual_approach</span><span class="output-field">emotional_arc</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="output-card reveal reveal-d2">
+      <div class="output-card-ico">🖼️</div>
+      <div>
+        <div class="output-card-label">Seção 3</div>
+        <div class="output-card-title">Uso dos Elementos</div>
+        <div class="output-card-desc">Mapeamento preciso de cada arquivo enviado: como usar, em qual momento, com qual propósito. Os agentes sabem exatamente o papel de cada asset do cliente.</div>
+        <div class="output-card-fields">
+          <span class="output-field">element_usage[]</span><span class="output-field">timing</span><span class="output-field">usage_instruction</span><span class="output-field">type</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="output-card reveal reveal-d3">
+      <div class="output-card-ico">📋</div>
+      <div>
+        <div class="output-card-label">Seção 4</div>
+        <div class="output-card-title">Diretrizes do DA + Cenas-Chave</div>
+        <div class="output-card-desc">Instruções detalhadas do Diretor de Arte em prosa, seguidas da lista de cenas-chave em ordem. É o roteiro que o Editor de Vídeo usa para montar a timeline.</div>
+        <div class="output-card-fields">
+          <span class="output-field">da_directives</span><span class="output-field">key_scenes[]</span><span class="output-field">music_suggestion</span><span class="output-field">production_notes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="output-card reveal">
+      <div class="output-card-ico">💰</div>
+      <div>
+        <div class="output-card-label">Seção 5</div>
+        <div class="output-card-title">Metadados &amp; Estimativa de Custo</div>
+        <div class="output-card-desc">ID do job, timestamp, modelo LLM usado, estimativa de custo por componente (LLM + stock + animação + geração AI). O VideoFlow usa para orçar o job antes de executar.</div>
+        <div class="output-card-fields">
+          <span class="output-field">id</span><span class="output-field">created_at</span><span class="output-field">llm_model</span><span class="output-field">estimated_cost</span><span class="output-field">priority</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- ═══════════════ TECH ═══════════════ -->
+<section>
+  <div class="section-num" data-n="05">Stack Técnico</div>
+  <h2 class="section-title reveal">Implementação &amp;<br><em>Integração</em></h2>
+  <p class="section-lead reveal reveal-d1">
+    VideoRobot é uma aplicação frontend standalone — HTML/CSS/JS puro sem dependências de build. Integra-se ao VideoFlow via API REST e ao LLM configurado via chamadas diretas a cada provedor.
+  </p>
+
+  <div class="tech-grid">
+    <div class="tech-cell reveal">
+      <div class="tech-cell-label">Frontend</div>
+      <div class="tech-cell-val">HTML · CSS · Vanilla JS</div>
+      <div class="tech-tags">
+        <span class="tech-tag">Sem framework</span>
+        <span class="tech-tag">CSS custom vars</span>
+        <span class="tech-tag">FileReader API</span>
+        <span class="tech-tag">localStorage persist</span>
+      </div>
+    </div>
+    <div class="tech-cell reveal reveal-d1">
+      <div class="tech-cell-label">LLM Router</div>
+      <div class="tech-cell-val">Multi-provider SDK</div>
+      <div class="tech-tags">
+        <span class="tech-tag">callAnthropic()</span>
+        <span class="tech-tag">callOpenAICompat()</span>
+        <span class="tech-tag">callGemini()</span>
+        <span class="tech-tag">callMinimax()</span>
+      </div>
+    </div>
+    <div class="tech-cell reveal">
+      <div class="tech-cell-label">Persistência</div>
+      <div class="tech-cell-val">localStorage</div>
+      <div class="tech-tags">
+        <span class="tech-tag">API keys salvas</span>
+        <span class="tech-tag">Provedores custom</span>
+        <span class="tech-tag">Config LLM ativa</span>
+      </div>
+    </div>
+    <div class="tech-cell reveal reveal-d1">
+      <div class="tech-cell-label">Integração VideoFlow</div>
+      <div class="tech-cell-val">REST API</div>
+      <div class="tech-tags">
+        <span class="tech-tag">POST /v1/jobs</span>
+        <span class="tech-tag">multipart upload</span>
+        <span class="tech-tag">JSON order payload</span>
+      </div>
+    </div>
+    <div class="tech-cell reveal">
+      <div class="tech-cell-label">Estado da Conversa</div>
+      <div class="tech-cell-val">In-memory STATE</div>
+      <div class="tech-tags">
+        <span class="tech-tag">conversations[2][]</span>
+        <span class="tech-tag">conversations[3][]</span>
+        <span class="tech-tag">files[] + ideas[]</span>
+      </div>
+    </div>
+    <div class="tech-cell reveal reveal-d1">
+      <div class="tech-cell-label">Versão Produção</div>
+      <div class="tech-cell-val">Next.js 15 Planned</div>
+      <div class="tech-tags">
+        <span class="tech-tag">App Router</span>
+        <span class="tech-tag">Server actions</span>
+        <span class="tech-tag">Auth via NextAuth</span>
+        <span class="tech-tag">Tenant context</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DIVIDER ═══════════════ -->
+<div class="divider-text">
+  <h2>Do <em>briefing</em> à produção<br>em uma conversa.</h2>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="footer-logo">Video<em>Robot</em></div>
+  <div class="footer-meta">VideoFlow · Módulo de Entrada · v1.0 · Março 2026</div>
+</footer>
+
+<script>
+// Reveal on scroll
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('on'); });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

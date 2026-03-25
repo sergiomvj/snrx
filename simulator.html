@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VideoFlow — Simulador Completo de Custos v2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0c0b09;--ink2:#38352f;--ink3:#78746c;--ink4:#b0ab9f;
+  --paper:#f5f2ec;--paper2:#ede9e1;--paper3:#e3ddd3;
+  --white:#fdfcf8;--accent:#1840e8;--green:#0b7a5c;--amber:#a85c08;
+  --red:#b01414;--purple:#5840c0;--teal:#0e7a7a;--coral:#c03820;
+  --sans:"DM Sans",system-ui,sans-serif;
+  --serif:"DM Serif Display",Georgia,serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:14px;line-height:1.65;font-weight:300;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--paper2)}
+::-webkit-scrollbar-thumb{background:var(--paper3);border-radius:3px}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(245,242,236,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--paper3);display:flex;align-items:center;padding:0 36px;height:52px;gap:0}
+.logo{font-family:var(--serif);font-size:18px;color:var(--ink);text-decoration:none;margin-right:32px;flex-shrink:0;letter-spacing:-.02em}
+.logo em{font-style:italic;color:var(--accent)}
+.nav-tabs{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.tab-btn{font-size:12px;font-weight:400;padding:5px 14px;border-radius:20px;cursor:pointer;border:1px solid transparent;color:var(--ink3);background:none;transition:all .15s;white-space:nowrap;font-family:inherit}
+.tab-btn:hover{background:var(--paper2);color:var(--ink2)}
+.tab-btn.on{background:var(--ink);color:var(--white)}
+.nav-badge{margin-left:auto;font-size:11px;color:var(--ink4);letter-spacing:.06em;text-transform:uppercase;flex-shrink:0}
+
+/* PAGES */
+.page{display:none;padding:36px}
+.page.on{display:block}
+
+/* SECTION HEADER */
+.sec-head{margin-bottom:28px}
+.sec-head h2{font-family:var(--serif);font-size:clamp(24px,3.5vw,36px);letter-spacing:-.025em;color:var(--ink);margin-bottom:6px}
+.sec-head p{font-size:13px;color:var(--ink3);line-height:1.6;max-width:640px}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:800px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--paper3);border-radius:12px;padding:18px 20px}
+.card-sm{background:var(--white);border:1px solid var(--paper3);border-radius:8px;padding:12px 14px}
+.card-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin-bottom:6px;font-weight:500}
+.card-val{font-family:var(--serif);font-size:28px;color:var(--ink);letter-spacing:-.02em;line-height:1}
+.card-sub{font-size:11px;color:var(--ink3);margin-top:4px}
+.card.dark{background:var(--ink);border-color:var(--ink)}
+.card.dark .card-label{color:rgba(255,255,255,.4)}
+.card.dark .card-val{color:#fff}
+.card.dark .card-sub{color:rgba(255,255,255,.4)}
+.card.green{background:#edfaf3;border-color:#9fe1cb}
+.card.green .card-val{color:var(--green)}
+.card.amber{background:#fdf0dc;border-color:#f0d89a}
+.card.amber .card-val{color:var(--amber)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--paper3);padding:8px 12px;text-align:left;white-space:nowrap;font-weight:500}
+td{padding:10px 12px;border-bottom:1px solid var(--paper2);color:var(--ink2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--paper2)}
+
+/* BADGE */
+.badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
+.b-blue{background:#e8eeff;color:var(--accent)}
+.b-green{background:#edfaf3;color:var(--green)}
+.b-amber{background:#fdf0dc;color:var(--amber)}
+.b-red{background:#fce8e8;color:var(--red)}
+.b-purple{background:#ece9ff;color:var(--purple)}
+.b-teal{background:#e0f5f5;color:var(--teal)}
+.b-coral{background:#fce8e0;color:var(--coral)}
+.b-gray{background:var(--paper2);color:var(--ink3)}
+.b-free{background:#fff3e0;color:#854f0b}
+
+/* CONTROLS */
+.ctrl-row{margin-bottom:16px}
+.ctrl-label{font-size:11px;color:var(--ink3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.ctrl-label .ctrl-val{font-weight:500;color:var(--accent);font-size:12px}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:var(--paper3);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--ink);cursor:pointer}
+select{width:100%;padding:8px 12px;border:1px solid var(--paper3);border-radius:8px;font-size:12px;background:var(--white);color:var(--ink2);font-family:inherit;cursor:pointer;outline:none}
+select:focus{border-color:var(--ink3)}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.toggle-lbl{font-size:12px;color:var(--ink2)}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--paper3);border-radius:10px;transition:.2s}
+.toggle-slider::before{position:absolute;content:"";height:14px;width:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s}
+.toggle input:checked+.toggle-slider{background:var(--accent)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(16px)}
+
+/* PROVIDER CARDS */
+.provider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:16px 0}
+.prov-card{background:var(--white);border:1px solid var(--paper3);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .18s;position:relative}
+.prov-card:hover{border-color:var(--ink3)}
+.prov-card.selected{border:2px solid var(--accent);background:rgba(24,64,232,.04)}
+.prov-card .prov-name{font-weight:500;font-size:13px;color:var(--ink);margin-bottom:3px}
+.prov-card .prov-type{font-size:10px;color:var(--ink3);margin-bottom:8px}
+.prov-card .prov-price{font-size:14px;font-weight:500;color:var(--green)}
+.prov-card .prov-detail{font-size:10px;color:var(--ink3);margin-top:2px}
+.prov-card .prov-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center}
+.prov-card.selected .prov-check{display:flex}
+.prov-card .prov-check::after{content:"✓";color:white;font-size:10px;font-weight:700}
+
+/* BREAKDOWN */
+.bkd{border:1px solid var(--paper3);border-radius:8px;overflow:hidden;margin-top:14px}
+.bkd-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--paper2);font-size:12px}
+.bkd-row:last-child{border-bottom:none}
+.bkd-row:nth-child(even){background:var(--paper2)}
+.bkd-left{display:flex;align-items:center;gap:8px}
+.bkd-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.bkd-agent{color:var(--ink2)}
+.bkd-model{font-size:10px;color:var(--ink3)}
+.bkd-cost{font-weight:500;color:var(--ink)}
+
+/* SCENARIO COMPARE */
+.sc-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+@media(max-width:700px){.sc-cards{grid-template-columns:1fr 1fr}}
+.sc-card{background:var(--white);border:1px solid var(--paper3);border-radius:10px;padding:16px}
+.sc-card.best{border:2px solid var(--green)}
+.sc-card .sc-t{font-weight:500;font-size:13px;margin-bottom:3px}
+.sc-card .sc-s{font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.4}
+.sc-card .sc-p{font-size:22px;font-weight:500;letter-spacing:-.02em}
+.sc-card .sc-u{font-size:10px;color:var(--ink3);margin-top:2px}
+.sc-card .sc-sv{font-size:11px;margin-top:8px;padding:2px 8px;border-radius:20px;display:inline-block}
+.best-tag{font-size:9px;font-weight:500;letter-spacing:.06em;padding:2px 7px;border-radius:20px;background:#edfaf3;color:var(--green);display:inline-block;margin-bottom:8px;text-transform:uppercase}
+
+/* NOTE */
+.note{background:#fdf0dc;border:1px solid #f0d89a;border-radius:8px;padding:12px 16px;font-size:12px;color:var(--amber);margin-top:16px;line-height:1.6}
+.note strong{font-weight:500}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--paper3);margin:24px 0}
+
+/* SCENARIO TAB BAR */
+.sc-bar{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.sc-btn{padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;border:1px solid var(--paper3);background:var(--white);color:var(--ink2);transition:all .15s;font-family:inherit}
+.sc-btn:hover{border-color:var(--ink3)}
+.sc-btn.on{background:var(--ink);color:var(--white);border-color:var(--ink)}
+
+/* AGENT ROW */
+.agent-row{display:grid;grid-template-columns:220px 1fr 170px 80px;border:1px solid var(--paper3);border-radius:8px;margin-bottom:6px;overflow:hidden;background:var(--white);font-size:12px}
+.agent-row:hover{border-color:var(--ink3)}
+.ar-a{padding:12px 16px;border-right:1px solid var(--paper2)}
+.ar-n{font-weight:500;font-size:13px;margin-bottom:3px}
+.ar-s{font-size:11px;color:var(--ink3)}
+.ar-d{padding:12px 16px;border-right:1px solid var(--paper2);color:var(--ink3);line-height:1.55}
+.ar-m{padding:12px 16px;border-right:1px solid var(--paper2)}
+.ar-mn{font-weight:500;font-size:12px}
+.ar-ms{font-size:11px;color:var(--ink4)}
+.ar-c{padding:12px 14px;text-align:right}
+.ar-cv{font-size:14px;font-weight:500}
+.ar-cs{font-size:10px;color:var(--ink3)}
+.ar-tot{background:var(--paper2)!important;font-weight:500}
+.ar-best{background:#edfaf3!important;border-color:#9fe1cb!important}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#">Video<em>Flow</em></a>
+  <div class="nav-tabs">
+    <button class="tab-btn on" onclick="goTab('llm')">Modelos LLM</button>
+    <button class="tab-btn" onclick="goTab('stock')">Provedores de Stock</button>
+    <button class="tab-btn" onclick="goTab('animation')" style="position:relative">Animação de Imagens <span style="position:absolute;top:-3px;right:-3px;background:var(--coral);color:#fff;font-size:8px;font-weight:600;padding:1px 4px;border-radius:4px;line-height:1.4">NOVO</span></button>
+    <button class="tab-btn" onclick="goTab('generation')">Geração AI (NB)</button>
+    <button class="tab-btn" onclick="goTab('scenarios')">Cenários Combinados</button>
+    <button class="tab-btn" onclick="goTab('estimator')">Simulador por Vídeo</button>
+  </div>
+  <div class="nav-badge">Simulador v2.1 · Março 2026</div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: LLM
+═══════════════════════════════════════════ -->
+<div class="page on" id="pg-llm">
+  <div class="sec-head">
+    <h2>Modelos LLM por agente</h2>
+    <p>Preços verificados março 2026. Selecione o cenário para ver a distribuição de modelos e custo estimado por produção.</p>
+  </div>
+
+  <div class="sc-bar">
+    <button class="sc-btn on" onclick="llmSc(0,this)">A — Anthropic Stack</button>
+    <button class="sc-btn" onclick="llmSc(1,this)">B — Google + MiniMax</button>
+    <button class="sc-btn" onclick="llmSc(2,this)">C — MiMo + GLM</button>
+    <button class="sc-btn" onclick="llmSc(3,this)">D — Ultra Budget</button>
+  </div>
+
+  <div id="llm-agents"></div>
+  <div class="sc-cards" id="llm-compare"></div>
+
+  <div class="divider"></div>
+  <h3 style="font-size:15px;font-weight:500;margin-bottom:14px;color:var(--ink)">Catálogo completo de modelos disponíveis</h3>
+  <div class="tbl-wrap">
+    <table id="llm-catalog"></table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: STOCK
+═══════════════════════════════════════════ -->
+<div class="page" id="pg-stock">
+  <div class="sec-head">
+    <h2>Provedores de Stock — Imagens & Vídeos</h2>
+    <p>Selecione os provedores que farão parte do seu stack. O custo de assets entra no simulador de custo por vídeo.</p>
+  </div>
+
+  <div class="g2" style="margin-bottom:28px">
+    <div>
+      <h3 style="font-size:14px;font-weight:500;margin-bottom:14px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">Imagens & Assets Visuais</h3>
+      <div class="provider-grid" id="img-providers"></div>
+    </div>
+    <div>
+      <h3 style="font-size:14px;font-weight:500;margin-bottom:14px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">Vídeos de Stock</h3>
+      <div class="provider-grid" id="vid-providers"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 style="font-size:15px;font-weight:500;margin-bottom:14px;color:var(--ink)">Comparativo completo de provedores</h3>
+  <div class="tbl-wrap">
+    <table id="stock-catalog"></table>
+  </div>
+
+  <div class="note" style="margin-top:20px">
+    <strong>Estratégia recomendada para o VideoFlow:</strong> usar Pexels + Pixabay como camada gratuita (zero custo por asset), Storyblocks como camada paga de volume (ilimitado por assinatura), e Getty/Shutterstock apenas para assets premium específicos. O Gerente de Elementos Visuais decide automaticamente qual provedor acionar com base no custo, qualidade e disponibilidade.
+  </div>
+</div>
+
+
+<!-- ═══════════════ PAGE: ANIMATION ═══════════════ -->
+<div class="page" id="pg-animation">
+  <div class="sec-head">
+    <h2>Animação de Imagens — a camada intermediária</h2>
+    <p>Dar vida a imagens estáticas custa <strong>muito menos</strong> que gerar vídeo por IA — e enriquece significativamente o resultado final. Existem duas categorias: <strong>animação programática CSS/JS</strong> (Ken Burns, parallax, zoom, morph — custo zero) e <strong>AI image-to-motion</strong> (modelos que geram 3–10s de movimento a partir de uma imagem estática, a fração do custo de text-to-video).</p>
+  </div>
+
+  <!-- PIPELINE VISUAL -->
+  <div class="card" style="margin-bottom:28px">
+    <div style="font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px">Posição no pipeline de assets do VideoFlow</div>
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">
+      <div style="padding:9px 14px;border-radius:7px;background:var(--paper2);border:1px solid var(--paper3);font-size:11px;font-weight:500;color:var(--ink3);text-align:center">Stock Gratuito<br><span style="font-size:9px;font-weight:400">Pexels · Pixabay</span></div>
+      <div style="color:var(--ink4);font-size:18px">→</div>
+      <div style="padding:9px 14px;border-radius:7px;background:var(--paper2);border:1px solid var(--paper3);font-size:11px;font-weight:500;color:var(--ink3);text-align:center">Stock Pago<br><span style="font-size:9px;font-weight:400">Shutterstock · Adobe</span></div>
+      <div style="color:var(--ink4);font-size:18px">→</div>
+      <div style="padding:9px 14px;border-radius:7px;background:rgba(192,56,32,.08);border:2px solid rgba(192,56,32,.35);font-size:12px;font-weight:600;color:var(--coral);text-align:center">✦ Animação de Imagem<br><span style="font-size:9px;font-weight:400">CSS/JS · AI img-to-motion</span></div>
+      <div style="color:var(--ink4);font-size:18px">→</div>
+      <div style="padding:9px 14px;border-radius:7px;background:var(--paper2);border:1px solid var(--paper3);font-size:11px;font-weight:500;color:var(--ink3);text-align:center">Geração AI<br><span style="font-size:9px;font-weight:400">Nano Banana · Flux</span></div>
+      <div style="color:var(--ink4);font-size:18px">→</div>
+      <div style="padding:9px 14px;border-radius:7px;background:var(--paper2);border:1px solid var(--paper3);font-size:11px;font-weight:500;color:var(--ink3);text-align:center">Geração de Vídeo AI<br><span style="font-size:9px;font-weight:400">Runway · Veo 3</span></div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--ink3);line-height:1.65;border-top:1px solid var(--paper3);padding-top:12px">
+      O Asset Router tenta a camada mais barata primeiro. Animação programática: <strong style="color:var(--ink2)">custo ≈ $0</strong> (só CPU/FFmpeg). AI image-to-motion: a partir de <strong style="color:var(--green)">$0.017/clip</strong> — vs text-to-video que começa em $0.10+.
+    </div>
+  </div>
+
+  <div class="g2" style="align-items:start;margin-bottom:24px">
+    <!-- Programática -->
+    <div>
+      <h3 style="font-size:13px;font-weight:600;margin-bottom:14px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">Camada A — Animação Programática (CSS/JS/FFmpeg)</h3>
+      <p style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.65">Aplicada pelo Editor de Vídeo sobre imagens de stock. Não há chamada de API. <strong style="color:var(--ink2)">Custo = zero</strong>. Ideal para backgrounds, paisagens, retratos e fotos de produtos.</p>
+      <div id="anim-css-cards"></div>
+    </div>
+    <!-- AI img-to-motion -->
+    <div>
+      <h3 style="font-size:13px;font-weight:600;margin-bottom:14px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">Camada B — AI Image-to-Motion (API por clip)</h3>
+      <p style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.65">Modelos que geram 3–10s de movimento orgânico a partir de uma imagem. Custo entre <strong style="color:var(--green)">3× e 20× menor</strong> que text-to-video completo.</p>
+      <div id="anim-ai-cards"></div>
+    </div>
+  </div>
+
+  <!-- CATALOGO COMPARATIVO -->
+  <div class="divider"></div>
+  <h3 style="font-size:14px;font-weight:500;margin-bottom:14px;color:var(--ink)">Comparativo completo — AI Image-to-Motion</h3>
+  <div class="tbl-wrap" style="margin-bottom:24px"><table id="anim-catalog-table"></table></div>
+
+  <!-- CALCULADORA -->
+  <div class="divider"></div>
+  <h3 style="font-size:14px;font-weight:500;margin-bottom:18px;color:var(--ink)">Calculadora de animação por vídeo</h3>
+  <div class="g2" style="align-items:start">
+    <!-- Controles -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px">Parâmetros</div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Imagens a animar por vídeo <span class="ctrl-val" id="acalc-n-l">5</span></div>
+          <input type="range" min="0" max="20" value="5" id="acalc-n" oninput="updateAnimCalc()">
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">% com animação CSS/JS (custo $0) <span class="ctrl-val" id="acalc-css-l">70%</span></div>
+          <input type="range" min="0" max="100" step="10" value="70" id="acalc-css" oninput="updateAnimCalc()">
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Efeito CSS padrão</div>
+          <select id="acalc-effect" onchange="updateAnimCalc()">
+            <option value="Ken Burns">Ken Burns (zoom + pan lento)</option>
+            <option value="Parallax">Parallax multicamada</option>
+            <option value="Zoom Suave">Zoom suave (scale in/out)</option>
+            <option value="Fade + Slide">Fade + slide direcional</option>
+            <option value="Lottie Overlay">Lottie overlay animado</option>
+            <option value="Morph SVG">Morphing SVG</option>
+          </select>
+        </div>
+        <div class="ctrl-row" style="margin-top:8px">
+          <div class="ctrl-label">Modelo AI para % restante</div>
+          <select id="acalc-model" onchange="updateAnimCalc()">
+            <option value="0.017">Hailuo 2.3 Fast 512p — $0.017/clip (3s)</option>
+            <option value="0.028">Hailuo 2.3 Std 768p — $0.028/clip (6s)</option>
+            <option value="0.049">Hailuo 2.3 Pro 1080p — $0.049/clip (6s)</option>
+            <option value="0.035">Kling 2.5 Turbo 5s — $0.035/clip</option>
+            <option value="0.070">Kling 2.6 Pro 5s — $0.070/clip</option>
+            <option value="0.050">Wan 2.5 (i2v) — $0.050/clip (5s)</option>
+            <option value="0.060">Pika 2.5 img2vid — $0.060/clip (4s)</option>
+            <option value="0.100">Runway Gen-4 img2vid — $0.100/clip (5s)</option>
+            <option value="0.150">Luma Ray3 img2vid — $0.150/clip (5s)</option>
+            <option value="0.300">Seedance 1.0 Pro — $0.300/clip (5s)</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Vídeos por mês <span class="ctrl-val" id="acalc-vol-l">50</span></div>
+          <input type="range" min="5" max="500" step="5" value="50" id="acalc-vol" oninput="updateAnimCalc()">
+        </div>
+      </div>
+      <div class="note" id="acalc-note" style="margin:0"></div>
+    </div>
+
+    <!-- Resultados -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="g2">
+        <div class="card dark">
+          <div class="card-label">Custo animação/vídeo</div>
+          <div class="card-val" id="acalc-per-vid">$0.00</div>
+          <div class="card-sub" id="acalc-per-vid-s">total de animações</div>
+        </div>
+        <div class="card green">
+          <div class="card-label">Custo mensal</div>
+          <div class="card-val" id="acalc-monthly">$0.00</div>
+          <div class="card-sub" id="acalc-monthly-s">50 vídeos/mês</div>
+        </div>
+      </div>
+
+      <!-- Breakdown por tipo -->
+      <div class="card">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Breakdown</div>
+        <div id="acalc-bkd"></div>
+        <!-- Comparativo visual de custo vs alternativas -->
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--paper3)">
+          <div style="font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Custo por clip animado vs text-to-video</div>
+          <div id="acalc-bars"></div>
+        </div>
+      </div>
+
+      <!-- Savings vs full video gen -->
+      <div class="card amber">
+        <div class="card-label">Economia vs text-to-video (Wan 2.6)</div>
+        <div class="card-val" id="acalc-savings">$0.00</div>
+        <div class="card-sub" id="acalc-savings-s">por vídeo produzido</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:20px">
+    <strong>Regra do Asset Router:</strong> 1º tenta Ken Burns/parallax CSS ($0) sobre imagens já obtidas do stock gratuito → 2º se a cena precisa de movimento orgânico, usa Hailuo Fast ($0.017–$0.049/clip) → 3º só usa text-to-video completo se a cena exige um movimento específico impossível de gerar a partir de uma imagem existente (ex.: cena de corrida, explosão, movimento de câmera complexo).
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     PAGE: GENERATION
+═══════════════════════════════════════════ -->
+<div class="page" id="pg-generation">
+  <div class="sec-head">
+    <h2>Geração AI — Nano Banana & Alternativas</h2>
+    <p>Preços de geração de imagem e vídeo por IA. Nano Banana (Gemini Flash Image) lidera o custo-benefício em 2026.</p>
+  </div>
+
+  <div class="g2" style="margin-bottom:24px">
+    <div>
+      <h3 style="font-size:14px;font-weight:500;margin-bottom:14px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">Geração de Imagem</h3>
+      <div class="tbl-wrap">
+        <table id="img-gen-catalog"></table>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:14px;font-weight:500;margin-bottom:14px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">Geração de Vídeo</h3>
+      <div class="tbl-wrap">
+        <table id="vid-gen-catalog"></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 style="font-size:15px;font-weight:500;margin-bottom:16px;color:var(--ink)">Configurar geração para o VideoFlow</h3>
+  <div class="g2">
+    <div class="card">
+      <div class="card-label">Modelo de imagem padrão</div>
+      <select id="img-model-sel" onchange="updateGenCalc()">
+        <option value="nb2_std">Nano Banana 2 Standard ($0.067/img)</option>
+        <option value="nb2_4k">Nano Banana 2 4K ($0.151/img)</option>
+        <option value="nbpro_std">Nano Banana Pro Standard ($0.134/img)</option>
+        <option value="nbpro_4k">Nano Banana Pro 4K ($0.240/img)</option>
+        <option value="dalle3">DALL-E 3 Standard ($0.040/img)</option>
+        <option value="flux">Flux 1.1 Pro ($0.055/img)</option>
+        <option value="ideogram">Ideogram 3.0 ($0.080/img)</option>
+      </select>
+      <div style="margin-top:14px">
+        <div class="ctrl-label">Imagens geradas por vídeo (média) <span class="ctrl-val" id="imgs-per-vid-l">3</span></div>
+        <input type="range" min="0" max="15" value="3" id="imgs-per-vid" oninput="updateGenCalc()">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">Modelo de vídeo padrão</div>
+      <select id="vid-model-sel" onchange="updateGenCalc()">
+        <option value="none">Não usar geração de vídeo AI</option>
+        <option value="runway_gen4">Runway Gen-4 ($0.05/s)</option>
+        <option value="veo3">Veo 3.0 ($0.35/s)</option>
+        <option value="kling3">Kling 3.0 ($0.14/s)</option>
+        <option value="sora2">Sora 2 ($0.15/s)</option>
+        <option value="wan2">Wan 2.6 ($0.02/s)</option>
+      </select>
+      <div style="margin-top:14px">
+        <div class="ctrl-label">Segundos de vídeo gerado por job <span class="ctrl-val" id="vid-secs-l">0</span></div>
+        <input type="range" min="0" max="60" value="0" id="vid-secs" oninput="updateGenCalc()">
+      </div>
+    </div>
+  </div>
+
+  <div class="g4" style="margin-top:14px" id="gen-results"></div>
+
+  <div class="note" style="margin-top:16px" id="gen-note"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: SCENARIOS
+═══════════════════════════════════════════ -->
+<div class="page" id="pg-scenarios">
+  <div class="sec-head">
+    <h2>Cenários combinados de custo</h2>
+    <p>Combinação de LLMs + Stock + Geração AI em 4 perfis de operação. Todos os custos por produção de vídeo.</p>
+  </div>
+
+  <div id="combined-scenarios"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: ESTIMATOR
+═══════════════════════════════════════════ -->
+<div class="page" id="pg-estimator">
+  <div class="sec-head">
+    <h2>Simulador de custo por vídeo</h2>
+    <p>Configure todos os parâmetros e veja o custo real estimado por minuto de vídeo produzido.</p>
+  </div>
+
+  <div class="g2">
+    <!-- CONTROLES -->
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px">Parâmetros do vídeo</div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Duração (minutos) <span class="ctrl-val" id="e-dur-l">2</span></div>
+          <input type="range" min="0.5" max="15" step="0.5" value="2" id="e-dur" oninput="fullEst()">
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Vídeos por mês <span class="ctrl-val" id="e-vol-l">50</span></div>
+          <input type="range" min="5" max="500" step="5" value="50" id="e-vol" oninput="fullEst()">
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Complexidade criativa <span class="ctrl-val" id="e-cx-l">Média</span></div>
+          <input type="range" min="1" max="3" value="2" id="e-cx" oninput="fullEst()">
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px">Configuração de LLMs</div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Cenário de modelos</div>
+          <select id="e-sc" onchange="fullEst()">
+            <option value="0">A — Anthropic Stack</option>
+            <option value="1">B — Google + MiniMax</option>
+            <option value="2">C — MiMo + GLM</option>
+            <option value="3">D — Ultra Budget</option>
+          </select>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle"><input type="checkbox" id="e-cache" checked onchange="fullEst()"><span class="toggle-slider"></span></label>
+          <span class="toggle-lbl">Prompt caching ativo (−90% tokens supervisor)</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px">Assets de Stock</div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Provedor de imagens</div>
+          <select id="e-img-prov" onchange="fullEst()">
+            <option value="0">Pexels (gratuito)</option>
+            <option value="0">Pixabay (gratuito)</option>
+            <option value="0.5">Unsplash+ ($0.50/img)</option>
+            <option value="2.5">Storyblocks assinatura (≈$2.50/img eq.)</option>
+            <option value="4">Adobe Stock (~$4/img em plano)</option>
+            <option value="7">Shutterstock (~$7/img em plano)</option>
+            <option value="130">Getty Images (UltraPack $130/img)</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Imagens de stock usadas por vídeo <span class="ctrl-val" id="e-imgs-l">5</span></div>
+          <input type="range" min="0" max="20" value="5" id="e-imgs" oninput="fullEst()">
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Provedor de vídeos de stock</div>
+          <select id="e-vid-prov" onchange="fullEst()">
+            <option value="0">Pexels Vídeo (gratuito)</option>
+            <option value="0">Pixabay Vídeo (gratuito)</option>
+            <option value="3">Storyblocks (≈$3/clip eq.)</option>
+            <option value="5">Pond5 (~$5/clip)</option>
+            <option value="9">Shutterstock Vídeo (~$9/clip)</option>
+            <option value="25">Adobe Stock Vídeo (~$25/clip)</option>
+            <option value="150">Getty Vídeo (~$150/clip)</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label">Clips de vídeo de stock por produção <span class="ctrl-val" id="e-clips-l">3</span></div>
+          <input type="range" min="0" max="15" value="3" id="e-clips" oninput="fullEst()">
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:0">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px">✦ Animação de Imagens</div>
+        <div class="toggle-row">
+          <label class="toggle"><input type="checkbox" id="e-use-anim" checked onchange="fullEst()"><span class="toggle-slider"></span></label>
+          <span class="toggle-lbl">Animar imagens de stock (CSS/JS ou AI)</span>
+        </div>
+        <div id="anim-est-ctrls">
+          <div class="ctrl-row" style="margin-top:10px">
+            <div class="ctrl-label">Imagens a animar por vídeo <span class="ctrl-val" id="e-anim-n-l">4</span></div>
+            <input type="range" min="0" max="20" value="4" id="e-anim-n" oninput="fullEst()">
+          </div>
+          <div class="ctrl-row">
+            <div class="ctrl-label">Tipo de animação</div>
+            <select id="e-anim-type" onchange="fullEst()">
+              <option value="0">DepthFlow OSS — Parallax 2.5D (gratuito, self-hosted)</option>
+              <option value="0.03">Immersity AI — Parallax 2.5D (~$0.03/clip)</option>
+              <option value="0.07">Hailuo MiniMax — Image-to-Video 6s ($0.07/clip)</option>
+              <option value="0.09">Pika 2.3 — Image-to-Video 3s ($0.09/clip)</option>
+              <option value="0.11">Kling Standard — Image-to-Video 5s ($0.11/clip)</option>
+              <option value="0.15">Seedance/WaveSpeed — Image-to-Video 5s ($0.15/clip)</option>
+              <option value="0.18">Kling Pro — Image-to-Video 5s ($0.18/clip)</option>
+              <option value="0.25">Runway Gen-4 — Image-to-Video 5s ($0.25/clip)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px">Geração AI (Nano Banana)</div>
+        <div class="toggle-row">
+          <label class="toggle"><input type="checkbox" id="e-use-gen" onchange="fullEst()"><span class="toggle-slider"></span></label>
+          <span class="toggle-lbl">Usar geração AI para lacunas de assets</span>
+        </div>
+        <div id="gen-controls" style="opacity:.4;pointer-events:none">
+          <div class="ctrl-row">
+            <div class="ctrl-label">Modelo de imagem AI</div>
+            <select id="e-gen-img" onchange="fullEst()">
+              <option value="0.067">Nano Banana 2 Std ($0.067)</option>
+              <option value="0.151">Nano Banana 2 4K ($0.151)</option>
+              <option value="0.134">Nano Banana Pro Std ($0.134)</option>
+              <option value="0.040">DALL-E 3 ($0.040)</option>
+              <option value="0.055">Flux 1.1 Pro ($0.055)</option>
+            </select>
+          </div>
+          <div class="ctrl-row">
+            <div class="ctrl-label">Imagens geradas por vídeo <span class="ctrl-val" id="e-gen-imgs-l">2</span></div>
+            <input type="range" min="0" max="10" value="2" id="e-gen-imgs" oninput="fullEst()">
+          </div>
+          <div class="ctrl-row">
+            <div class="ctrl-label">Modelo de vídeo AI</div>
+            <select id="e-gen-vid" onchange="fullEst()">
+              <option value="0">Não usar</option>
+              <option value="0.05">Runway Gen-4 ($0.05/s)</option>
+              <option value="0.02">Wan 2.6 ($0.02/s)</option>
+              <option value="0.14">Kling 3.0 ($0.14/s)</option>
+              <option value="0.35">Veo 3.0 ($0.35/s)</option>
+            </select>
+          </div>
+          <div class="ctrl-row">
+            <div class="ctrl-label">Segundos de vídeo gerado <span class="ctrl-val" id="e-gen-secs-l">0</span></div>
+            <input type="range" min="0" max="30" value="0" id="e-gen-secs" oninput="fullEst()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div>
+      <div class="g2" style="margin-bottom:14px">
+        <div class="card dark">
+          <div class="card-label">Custo por vídeo</div>
+          <div class="card-val" id="r-per-vid">$0.00</div>
+          <div class="card-sub" id="r-per-vid-s">custo total de produção</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Custo por minuto</div>
+          <div class="card-val" id="r-per-min">$0.00</div>
+          <div class="card-sub">de vídeo produzido</div>
+        </div>
+        <div class="card green">
+          <div class="card-label">Custo mensal</div>
+          <div class="card-val" id="r-monthly">$0.00</div>
+          <div class="card-sub" id="r-monthly-s">50 vídeos/mês</div>
+        </div>
+        <div class="card amber">
+          <div class="card-label">Custo anual</div>
+          <div class="card-val" id="r-annual">$0.00</div>
+          <div class="card-sub">projeção 12 meses</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">Breakdown de custos</div>
+        <div class="bkd" id="r-bkd"></div>
+      </div>
+
+      <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Comparativo entre cenários LLM (mesmo config. de assets)</div>
+      <div id="r-sc-compare" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+
+      <div class="note" style="margin-top:14px" id="r-note"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────
+const AGENTS=[
+  {id:'orch',  name:'Orquestrador',            tag:'Criativo', color:'#534AB7', desc:'síntese + esqueleto + vetor DA',  inv:1,   ti:4000, to:1200},
+  {id:'ref',   name:'Ger. Referências Visuais',tag:'Criativo', color:'#0F6E56', desc:'busca + avaliação VLM',           inv:1,   ti:3000, to:800},
+  {id:'elem',  name:'Ger. Elementos Visuais',  tag:'Execução', color:'#993C1D', desc:'assets + geração (condicional)',  inv:0.7, ti:2000, to:600},
+  {id:'edit',  name:'Editor de Vídeo',         tag:'Execução', color:'#185FA5', desc:'timeline + render instructions', inv:1,   ti:3500, to:1000},
+  {id:'pub',   name:'Assistente de Publicação',tag:'Execução', color:'#854F0B', desc:'copy + hashtags + variações',     inv:1,   ti:1500, to:700},
+  {id:'sup',   name:'Supervisor de Qualidade', tag:'Controle', color:'#A32D2D', desc:'4-5 checkpoints vs rubric DA',   inv:4.5, ti:5000, to:400},
+];
+const MODELS={
+  sonnet:    {n:'Claude Sonnet 4.6',   v:'Anthropic', iP:3.00,  oP:15.00, ctx:'200K', mm:'—'},
+  haiku:     {n:'Claude Haiku 4.5',    v:'Anthropic', iP:0.25,  oP:1.25,  ctx:'200K', mm:'—'},
+  gflash:    {n:'Gemini 2.5 Flash',    v:'Google',    iP:0.30,  oP:2.50,  ctx:'1M',   mm:'Sim'},
+  gflite:    {n:'Gem. 2.0 Flash-Lite', v:'Google',    iP:0.075, oP:0.30,  ctx:'1M',   mm:'Parcial'},
+  minimax:   {n:'MiniMax M2.5',        v:'MiniMax',   iP:0.20,  oP:0.95,  ctx:'1M',   mm:'—'},
+  glm47:     {n:'GLM-4.7',             v:'ZhipuAI',   iP:0.60,  oP:2.20,  ctx:'128K', mm:'Parcial'},
+  glm47f:    {n:'GLM-4.7 Flash',       v:'ZhipuAI',   iP:0.06,  oP:0.40,  ctx:'200K', mm:'—'},
+  mimopro:   {n:'MiMo V2 Pro',         v:'Xiaomi',    iP:1.00,  oP:3.00,  ctx:'1M',   mm:'—'},
+  mimoomni:  {n:'MiMo V2 Omni',        v:'Xiaomi',    iP:0.40,  oP:2.00,  ctx:'262K', mm:'Sim(audio+vid)'},
+  mimoflash: {n:'MiMo V2 Flash',       v:'Xiaomi',    iP:0.09,  oP:0.29,  ctx:'256K', mm:'—'},
+};
+const MTIER={sonnet:'Premium',haiku:'Mid',gflash:'Mid',gflite:'Budget',minimax:'Budget',glm47:'Budget',glm47f:'Gratuito*',mimopro:'Mid',mimoomni:'Mid',mimoflash:'Budget'};
+const MTIERCLS={Premium:'b-purple',Mid:'b-blue','Budget':'b-green','Gratuito*':'b-free'};
+const MROLE={
+  sonnet:'Orquestrador, Supervisor',haiku:'Editor, Publicação, Elementos',
+  gflash:'Ger. Referências (visão)',gflite:'Publicação, Elementos (fallback)',
+  minimax:'Orquestrador alt., Supervisor alt.',glm47:'Orquestrador alt.',
+  glm47f:'Publicação, Elementos',mimopro:'Orquestrador alt., Supervisor alt.',
+  mimoomni:'Ger. Referências alt. (multimodal)',mimoflash:'Editor, Elementos, Publicação'
+};
+const SCS=[
+  {name:'A — Anthropic',  desc:'Máxima confiabilidade e qualidade de raciocínio.',      models:{orch:'sonnet',ref:'gflash',elem:'haiku',edit:'haiku',pub:'haiku',sup:'sonnet'}},
+  {name:'B — Google+MiniMax',desc:'Mix estratégico: MiniMax para criatividade, Google para visão.',models:{orch:'minimax',ref:'gflash',elem:'gflite',edit:'gflite',pub:'gflite',sup:'minimax'}},
+  {name:'C — MiMo+GLM',   desc:'Stack asiático: MiMo Pro para orquestração, GLM Flash para execução.',models:{orch:'mimopro',ref:'mimoomni',elem:'glm47f',edit:'mimoflash',pub:'glm47f',sup:'mimopro'}},
+  {name:'D — Ultra Budget',desc:'Custo mínimo: GLM Flash gratuito onde possível.',       models:{orch:'glm47',ref:'mimoomni',elem:'glm47f',edit:'mimoflash',pub:'glm47f',sup:'minimax'}},
+];
+const CXLBL=['Simples','Média','Complexa'];
+const CXMULT=[0.6,1.0,1.6];
+
+// STOCK PROVIDERS
+const IMG_PROVIDERS=[
+  {id:'pexels',    name:'Pexels',       type:'Imagem',     model:'Gratuito (API)',  pricePerAsset:0,    annual:0,       badge:'b-free',  highlight:'API gratuita, sem atribuição obrigatória. 150K+ fotos curadas.'},
+  {id:'pixabay',   name:'Pixabay',      type:'Imagem',     model:'Gratuito (API)',  pricePerAsset:0,    annual:0,       badge:'b-free',  highlight:'3M+ imagens, vídeos e sons. Licença Pixabay = uso comercial.'},
+  {id:'unsplash',  name:'Unsplash+',    type:'Imagem',     model:'$13/mês',         pricePerAsset:0.5,  annual:156,     badge:'b-green', highlight:'3M+ fotos curadas de alta qualidade. API paga para produção.'},
+  {id:'storyblk',  name:'Storyblocks',  type:'Imagem+Vídeo',model:'$252-$480/ano',  pricePerAsset:2.5,  annual:360,     badge:'b-blue',  highlight:'Ilimitado. Inclui After Effects/Premiere Pro templates.'},
+  {id:'adobe',     name:'Adobe Stock',  type:'Imagem+Vídeo',model:'$29-$200/mês',   pricePerAsset:4,    annual:588,     badge:'b-amber', highlight:'200M+ assets. Integrado ao Creative Cloud.'},
+  {id:'shutters',  name:'Shutterstock', type:'Imagem+Vídeo',model:'$29-$199/mês',   pricePerAsset:7,    annual:948,     badge:'b-amber', highlight:'500M+ assets. API robusta. Maior biblioteca.'},
+  {id:'getty',     name:'Getty Images', type:'Imagem+Vídeo',model:'UltraPack $130+',pricePerAsset:130,  annual:null,    badge:'b-red',   highlight:'Premium editorial. UltraPacks $130-499/asset.'},
+  {id:'istock',    name:'iStock',       type:'Imagem',     model:'$29-$40/mês',     pricePerAsset:2,    annual:480,     badge:'b-green', highlight:'Sibling da Getty. Preço mais acessível com qualidade similar.'},
+];
+const VID_PROVIDERS=[
+  {id:'pexels_v',  name:'Pexels Vídeo',  type:'Vídeo',   model:'Gratuito (API)',    pricePerAsset:0,    annual:0,       badge:'b-free',  highlight:'150K+ vídeos HD/4K. Licença comercial livre.'},
+  {id:'pixabay_v', name:'Pixabay Vídeo', type:'Vídeo',   model:'Gratuito (API)',    pricePerAsset:0,    annual:0,       badge:'b-free',  highlight:'1M+ vídeos. CC0 license.'},
+  {id:'pond5',     name:'Pond5',         type:'Vídeo',   model:'$5+/clip avulso',   pricePerAsset:5,    annual:null,    badge:'b-green', highlight:'Menor preço avulso. Clips a partir de $5.'},
+  {id:'storyblk_v',name:'Storyblocks',   type:'Vídeo',   model:'Incluso na assin.', pricePerAsset:3,    annual:360,     badge:'b-blue',  highlight:'Ilimitado. 4K, HD, AE templates incluídos.'},
+  {id:'videvo',    name:'Videvo',        type:'Vídeo',   model:'Freemium',           pricePerAsset:1.5,  annual:null,    badge:'b-green', highlight:'Mix gratuito + premium. Motion graphics incluídos.'},
+  {id:'artlist',   name:'Artlist',       type:'Vídeo+Áudio',model:'$199-$349/ano',   pricePerAsset:4,    annual:249,     badge:'b-amber', highlight:'Footage + música + SFX tudo incluído. Ótimo para YT.'},
+  {id:'adobe_v',   name:'Adobe Stock V', type:'Vídeo',   model:'Incluso no plano',   pricePerAsset:25,   annual:588,     badge:'b-amber', highlight:'Alta qualidade, integrado ao Premiere Pro.'},
+  {id:'getty_v',   name:'Getty Vídeo',   type:'Vídeo',   model:'$150+/clip',         pricePerAsset:150,  annual:null,    badge:'b-red',   highlight:'Footage editorial premium. Exclusive content.'},
+];
+
+// IMAGE/VIDEO GENERATION
+const IMG_GEN=[
+  {name:'Nano Banana 2 Standard',    provider:'Google',   price512:0.045, price1k:0.067, price4k:0.151, badge:'b-green', note:'Google Gemini Flash Image. Melhor custo-benefício 2026.'},
+  {name:'Nano Banana 2 (Batch -50%)',provider:'Google',   price512:0.022, price1k:0.034, price4k:0.076, badge:'b-free',  note:'Batch API com 50% de desconto. Entrega assíncrona em 24h.'},
+  {name:'Nano Banana Pro Standard',  provider:'Google',   price512:null,  price1k:0.134, price4k:0.240, badge:'b-blue',  note:'Mais qualidade que NB2. Melhor para imagens de marca.'},
+  {name:'Nano Banana Pro (Batch)',    provider:'Google',   price512:null,  price1k:0.067, price4k:0.120, badge:'b-teal',  note:'50% desconto na Batch API.'},
+  {name:'DALL-E 3 Standard',         provider:'OpenAI',   price512:null,  price1k:0.040, price4k:0.080, badge:'b-amber', note:'1024×1024 e 1792×1024.'},
+  {name:'Flux 1.1 Pro',              provider:'Black Forest',price512:null,price1k:0.055,price4k:null,  badge:'b-purple',note:'Open source, via Replicate API.'},
+  {name:'Ideogram 3.0',              provider:'Ideogram',  price512:null,  price1k:0.080, price4k:0.110, badge:'b-coral', note:'Excelente para texto em imagens.'},
+  {name:'Midjourney (Relax)',         provider:'Midjourney',price512:null, price1k:null,  price4k:0.04,  badge:'b-gray',  note:'Via API parceira. Preço por GPU-minute.'},
+];
+const VID_GEN=[
+  {name:'Wan 2.6',        provider:'Alibaba/OSS',price_per_s:0.02, badge:'b-free',  note:'Open source. Melhor custo absoluto para geração de vídeo.'},
+  {name:'Runway Gen-4.5', provider:'Runway',     price_per_s:0.05, badge:'b-green', note:'5-10s clips. Alta qualidade cinematográfica.'},
+  {name:'Kling 3.0',      provider:'Kuaishou',   price_per_s:0.14, badge:'b-blue',  note:'Realismo elevado. Boa consistência de personagem.'},
+  {name:'Sora 2',         provider:'OpenAI',     price_per_s:0.15, badge:'b-amber', note:'20s clips HD. Prompt following excelente.'},
+  {name:'Veo 3.0',        provider:'Google',     price_per_s:0.35, badge:'b-red',   note:'Qualidade premium com áudio nativo gerado.'},
+  {name:'Pika 2.5',       provider:'Pika Labs',  price_per_s:0.08, badge:'b-purple',note:'Image-to-video com controles cinematográficos.'},
+];
+
+// Selected providers (default)
+let selImgProv = new Set(['pexels','pixabay']);
+let selVidProv = new Set(['pexels_v','pixabay_v']);
+
+// ─── LLM HELPERS ────────────────────────────────────────────────────────────
+function agCost(agIdx, scIdx, cache=false, mult=1) {
+  const ag=AGENTS[agIdx], mk=SCS[scIdx].models[ag.id], m=MODELS[mk];
+  const cr=cache?(ag.id==='sup'||ag.id==='orch'?0.15:0.7):1.0;
+  return (ag.ti*ag.inv*mult*cr/1e6*m.iP)+(ag.to*ag.inv*mult/1e6*m.oP);
+}
+
+// ─── LLM PAGE ────────────────────────────────────────────────────────────────
+let curLLMSc=0;
+function llmSc(idx,btn){
+  curLLMSc=idx;
+  document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderLLMAgents(idx);
+}
+function renderLLMAgents(idx){
+  const sc=SCS[idx];
+  let html='';
+  AGENTS.forEach((ag,i)=>{
+    const mk=sc.models[ag.id], m=MODELS[mk];
+    const c=agCost(i,idx);
+    html+=`<div class="agent-row">
+      <div class="ar-a">
+        <div style="font-size:9px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:20px;display:inline-block;margin-bottom:5px;background:${ag.color}18;color:${ag.color}">${ag.tag}</div>
+        <div class="ar-n">${ag.name}</div><div class="ar-s">${ag.inv}× invocação${ag.inv!==1?'s':''}</div>
+      </div>
+      <div class="ar-d">${ag.desc}</div>
+      <div class="ar-m"><div class="ar-mn">${m.n}</div><div class="ar-ms">${m.v}</div></div>
+      <div class="ar-c"><div class="ar-cv">$${c.toFixed(4)}</div><div class="ar-cs">/produção</div></div>
+    </div>`;
+  });
+  const total=AGENTS.reduce((s,_,i)=>s+agCost(i,idx),0);
+  const cached=AGENTS.reduce((s,_,i)=>s+agCost(i,idx,true),0);
+  html+=`<div class="agent-row ar-tot"><div class="ar-a" style="grid-column:1/3"><div class="ar-s">Total sem caching</div></div><div class="ar-d"></div><div class="ar-m"></div><div class="ar-c"><div class="ar-cv">$${total.toFixed(4)}</div></div></div>
+  <div class="agent-row ar-best"><div class="ar-a" style="grid-column:1/3"><div class="ar-s">Total com prompt caching</div></div><div class="ar-d"></div><div class="ar-m"></div><div class="ar-c"><div class="ar-cv" style="color:var(--green)">$${cached.toFixed(4)} <span style="font-size:10px">(−${Math.round((1-cached/total)*100)}%)</span></div></div></div>`;
+  document.getElementById('llm-agents').innerHTML=html;
+
+  // Compare all 4
+  const baseC=AGENTS.reduce((s,_,i)=>s+agCost(i,0,true),0);
+  const costs=SCS.map((_,si)=>AGENTS.reduce((s,_,i)=>s+agCost(i,si,true),0));
+  const minC=Math.min(...costs);
+  document.getElementById('llm-compare').innerHTML=SCS.map((s,si)=>{
+    const c=costs[si], isBest=Math.abs(c-minC)<0.00001;
+    const sv=si===0?null:Math.round((1-c/baseC)*100);
+    return `<div class="sc-card${isBest?' best':''}">
+      ${isBest?'<div class="best-tag">menor custo</div><br>':''}
+      <div class="sc-t">${s.name}</div><div class="sc-s">${s.desc}</div>
+      <div class="sc-p">$${c.toFixed(4)}</div><div class="sc-u">/produção · com caching</div>
+      ${sv!==null?`<div class="sc-sv" style="background:#edfaf3;color:var(--green)">−${sv}% vs A</div>`:'<div class="sc-sv" style="background:var(--paper2);color:var(--ink3)">Referência</div>'}
+    </div>`;
+  }).join('');
+}
+
+// Catalog table
+function renderLLMCatalog(){
+  const rows=Object.entries(MODELS).map(([k,m])=>`<tr>
+    <td><strong>${m.n}</strong></td>
+    <td style="color:var(--ink3)">${m.v}</td>
+    <td><span class="badge ${MTIERCLS[MTIER[k]]}">${MTIER[k]}</span></td>
+    <td><strong>$${m.iP.toFixed(3)}</strong></td>
+    <td>$${m.oP.toFixed(2)}</td>
+    <td style="color:var(--ink3)">${m.ctx}</td>
+    <td>${m.mm}</td>
+    <td style="color:var(--ink3);font-size:11px">${MROLE[k]||''}</td>
+  </tr>`).join('');
+  document.getElementById('llm-catalog').innerHTML=`<thead><tr><th>Modelo</th><th>Fornecedor</th><th>Tier</th><th>Input /1M</th><th>Output /1M</th><th>Contexto</th><th>Multimodal</th><th>Papel no VideoFlow</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+// ─── STOCK PAGE ───────────────────────────────────────────────────────────────
+function renderStock(){
+  function makeProvCard(p, selSet) {
+    const sel = selSet.has(p.id);
+    return `<div class="prov-card${sel?' selected':''}" onclick="toggleProv('${p.id}',this,'${selSet===selImgProv?'img':'vid'}')">
+      <div class="prov-check"></div>
+      <div class="prov-name">${p.name}</div>
+      <div class="prov-type">${p.type}</div>
+      <div class="prov-price">${p.pricePerAsset===0?'Gratuito':'$'+p.pricePerAsset.toFixed(2)+'/asset'}</div>
+      <div class="prov-detail">${p.model}</div>
+    </div>`;
+  }
+  document.getElementById('img-providers').innerHTML=IMG_PROVIDERS.map(p=>makeProvCard(p,selImgProv)).join('');
+  document.getElementById('vid-providers').innerHTML=VID_PROVIDERS.map(p=>makeProvCard(p,selVidProv)).join('');
+
+  // Catalog table
+  const allProvs=[...IMG_PROVIDERS,...VID_PROVIDERS];
+  const rows=allProvs.map(p=>`<tr>
+    <td><strong>${p.name}</strong></td>
+    <td><span class="badge b-gray">${p.type}</span></td>
+    <td>${p.model}</td>
+    <td><strong>${p.pricePerAsset===0?'Gratuito':'$'+p.pricePerAsset.toFixed(2)}</strong></td>
+    <td style="color:var(--ink3)">${p.annual?'$'+p.annual+'/ano':p.pricePerAsset===0?'Zero':'Avulso'}</td>
+    <td style="font-size:11px;color:var(--ink3)">${p.highlight}</td>
+  </tr>`).join('');
+  document.getElementById('stock-catalog').innerHTML=`<thead><tr><th>Provedor</th><th>Tipo</th><th>Modelo de preço</th><th>Custo/asset</th><th>Assinatura</th><th>Características</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+function toggleProv(id, el, type) {
+  const s = type==='img' ? selImgProv : selVidProv;
+  if(s.has(id)){if(s.size>1)s.delete(id);}else{s.add(id);}
+  el.classList.toggle('selected',s.has(id));
+  fullEst();
+}
+
+// ─── GENERATION PAGE ─────────────────────────────────────────────────────────
+function renderGeneration(){
+  // Image gen table
+  const imgRows=IMG_GEN.map(g=>`<tr>
+    <td><strong>${g.name}</strong></td>
+    <td style="color:var(--ink3)">${g.provider}</td>
+    <td><span class="badge ${g.badge}">${g.price512?'$'+g.price512:'—'}</span></td>
+    <td><strong>${g.price1k?'$'+g.price1k:'—'}</strong></td>
+    <td>${g.price4k?'$'+g.price4k:'—'}</td>
+    <td style="font-size:11px;color:var(--ink3)">${g.note}</td>
+  </tr>`).join('');
+  document.getElementById('img-gen-catalog').innerHTML=`<thead><tr><th>Modelo</th><th>Fornecedor</th><th>512px</th><th>1K-2K</th><th>4K</th><th>Nota</th></tr></thead><tbody>${imgRows}</tbody>`;
+
+  // Video gen table
+  const vidRows=VID_GEN.map(g=>`<tr>
+    <td><strong>${g.name}</strong></td>
+    <td style="color:var(--ink3)">${g.provider}</td>
+    <td><span class="badge ${g.badge}">$${g.price_per_s}/s</span></td>
+    <td style="color:var(--ink3)">$${(g.price_per_s*10).toFixed(2)}/10s</td>
+    <td style="font-size:11px;color:var(--ink3)">${g.note}</td>
+  </tr>`).join('');
+  document.getElementById('vid-gen-catalog').innerHTML=`<thead><tr><th>Modelo</th><th>Fornecedor</th><th>$/segundo</th><th>Clip 10s</th><th>Nota</th></tr></thead><tbody>${vidRows}</tbody>`;
+
+  updateGenCalc();
+}
+
+function updateGenCalc(){
+  const imgModels={
+    nb2_std:{p:0.067,n:'Nano Banana 2 Std'}, nb2_4k:{p:0.151,n:'Nano Banana 2 4K'},
+    nbpro_std:{p:0.134,n:'NB Pro Std'},       nbpro_4k:{p:0.240,n:'NB Pro 4K'},
+    dalle3:{p:0.040,n:'DALL-E 3'},            flux:{p:0.055,n:'Flux 1.1 Pro'},
+    ideogram:{p:0.080,n:'Ideogram 3.0'}
+  };
+  const vidModels={
+    none:{p:0,n:'—'},runway_gen4:{p:0.05,n:'Runway Gen-4'},
+    veo3:{p:0.35,n:'Veo 3.0'},kling3:{p:0.14,n:'Kling 3.0'},
+    sora2:{p:0.15,n:'Sora 2'},wan2:{p:0.02,n:'Wan 2.6'}
+  };
+  const imgSel=document.getElementById('img-model-sel').value;
+  const vidSel=document.getElementById('vid-model-sel').value;
+  const nImgs=+document.getElementById('imgs-per-vid').value;
+  const vSecs=+document.getElementById('vid-secs').value;
+  document.getElementById('imgs-per-vid-l').textContent=nImgs;
+  document.getElementById('vid-secs-l').textContent=vSecs+'s';
+
+  const imgM=imgModels[imgSel], vidM=vidModels[vidSel];
+  const imgCost=imgM.p*nImgs, vidCost=vidM.p*vSecs, total=imgCost+vidCost;
+
+  document.getElementById('gen-results').innerHTML=`
+    <div class="card-sm"><div class="card-label">Custo imagens/vídeo</div><div class="card-val" style="font-size:22px">$${imgCost.toFixed(3)}</div><div class="card-sub">${nImgs} imgs × $${imgM.p}</div></div>
+    <div class="card-sm"><div class="card-label">Custo vídeo AI/job</div><div class="card-val" style="font-size:22px">$${vidCost.toFixed(3)}</div><div class="card-sub">${vSecs}s × $${vidM.p}/s</div></div>
+    <div class="card-sm dark"><div class="card-label">Total geração AI</div><div class="card-val" style="font-size:22px">$${total.toFixed(3)}</div><div class="card-sub">por produção</div></div>
+    <div class="card-sm green"><div class="card-label">Custo mensal (100 jobs)</div><div class="card-val" style="font-size:22px">$${(total*100).toFixed(0)}</div><div class="card-sub">100 vídeos/mês</div></div>
+  `;
+  document.getElementById('gen-note').innerHTML=`<strong>Modelo selecionado: ${imgM.n}</strong> — $${imgM.p}/imagem. ${vidSel!=='none'?`Geração de vídeo: ${vidM.n} a $${vidM.p}/segundo.`:''} Para volumes altos, use a Batch API do Nano Banana 2 com 50% de desconto (entrega em até 24h).`;
+}
+
+// ─── FULL ESTIMATOR ───────────────────────────────────────────────────────────
+function fullEst(){
+  const dur=+document.getElementById('e-dur').value;
+  const vol=+document.getElementById('e-vol').value;
+  const cx=+document.getElementById('e-cx').value-1;
+  const si=+document.getElementById('e-sc').value;
+  const cache=document.getElementById('e-cache').checked;
+  const imgProvCost=+document.getElementById('e-img-prov').value;
+  const nImgs=+document.getElementById('e-imgs').value;
+  const vidProvCost=+document.getElementById('e-vid-prov').value;
+  const nClips=+document.getElementById('e-clips').value;
+  const useAnim=document.getElementById('e-use-anim').checked;
+  const animImgN=useAnim?+document.getElementById('e-anim-n').value:0;
+  const animClipP=useAnim?+document.getElementById('e-anim-type').value:0;
+  const useGen=document.getElementById('e-use-gen').checked;
+  const genImgP=useGen?+document.getElementById('e-gen-img').value:0;
+  const nGenImgs=useGen?+document.getElementById('e-gen-imgs').value:0;
+  const genVidP=useGen?+document.getElementById('e-gen-vid').value:0;
+  const genVidS=useGen?+document.getElementById('e-gen-secs').value:0;
+
+  // Update labels
+  document.getElementById('e-dur-l').textContent=dur+'min';
+  document.getElementById('e-vol-l').textContent=vol;
+  document.getElementById('e-cx-l').textContent=CXLBL[cx];
+  document.getElementById('e-imgs-l').textContent=nImgs;
+  document.getElementById('e-clips-l').textContent=nClips;
+  document.getElementById('e-anim-n-l').textContent=animImgN;
+  if(useGen){
+    document.getElementById('e-gen-imgs-l').textContent=nGenImgs;
+    document.getElementById('e-gen-secs-l').textContent=genVidS+'s';
+    document.getElementById('gen-controls').style.opacity='1';
+    document.getElementById('gen-controls').style.pointerEvents='auto';
+  } else {
+    document.getElementById('gen-controls').style.opacity='.4';
+    document.getElementById('gen-controls').style.pointerEvents='none';
+  }
+
+  const mult=CXMULT[cx]*(0.7+dur*0.15);
+  let llmCost=0, bkd='';
+  AGENTS.forEach((ag,i)=>{
+    const mk=SCS[si].models[ag.id], m=MODELS[mk];
+    const c=agCost(i,si,cache,mult);
+    llmCost+=c;
+    bkd+=`<div class="bkd-row">
+      <div class="bkd-left"><div class="bkd-dot" style="background:${ag.color}"></div><span class="bkd-agent">${ag.name}</span><span class="bkd-model">${m.n}</span></div>
+      <div class="bkd-cost">$${c.toFixed(4)}</div></div>`;
+  });
+
+  const stockCost=(imgProvCost*nImgs)+(vidProvCost*nClips);
+  const animCost=animClipP*animImgN;
+  const genCost=(genImgP*nGenImgs)+(genVidP*genVidS);
+  const total=llmCost+stockCost+animCost+genCost;
+  const perMin=total/dur;
+  const monthly=total*vol;
+
+  bkd+=`<div class="bkd-row" style="background:var(--paper2)"><div class="bkd-left"><div class="bkd-dot" style="background:var(--green)"></div><span class="bkd-agent">Assets de stock</span><span class="bkd-model">${nImgs} imgs + ${nClips} clips</span></div><div class="bkd-cost">$${stockCost.toFixed(3)}</div></div>`;
+  if(useAnim) bkd+=`<div class="bkd-row" style="background:var(--paper2)"><div class="bkd-left"><div class="bkd-dot" style="background:var(--teal)"></div><span class="bkd-agent">Animação de imagens</span><span class="bkd-model">${animImgN}× · ${animClipP===0?'Ken Burns/CSS $0':('$'+animClipP+'/clip')}</span></div><div class="bkd-cost" style="color:${animClipP===0?'var(--green)':'var(--ink)'}">$${animCost.toFixed(3)}</div></div>`;
+  if(useGen && genCost>0) bkd+=`<div class="bkd-row" style="background:var(--paper2)"><div class="bkd-left"><div class="bkd-dot" style="background:var(--purple)"></div><span class="bkd-agent">Geração AI</span><span class="bkd-model">Nano Banana + vídeo AI</span></div><div class="bkd-cost">$${genCost.toFixed(3)}</div></div>`;
+
+  document.getElementById('r-per-vid').textContent='$'+total.toFixed(4);
+  document.getElementById('r-per-vid-s').textContent=`${dur}min · ${CXLBL[cx]} · ${vol} vídeos/mês`;
+  document.getElementById('r-per-min').textContent='$'+perMin.toFixed(4);
+  document.getElementById('r-monthly').textContent='$'+monthly.toFixed(2);
+  document.getElementById('r-monthly-s').textContent=vol+' vídeos/mês';
+  document.getElementById('r-annual').textContent='$'+(monthly*12).toFixed(2);
+  document.getElementById('r-bkd').innerHTML=bkd;
+
+  // Compare all 4 scenarios with same asset config
+  const scData=SCS.map((_,si2)=>{
+    const llm2=AGENTS.reduce((s,_,i)=>s+agCost(i,si2,cache,mult),0);
+    return {total:llm2+stockCost+animCost+genCost, name:SCS[si2].name};
+  });
+  const baseT=scData[0].total;
+  document.getElementById('r-sc-compare').innerHTML=scData.map((sc,si2)=>{
+    const sv=si2===0?null:Math.round((1-sc.total/baseT)*100);
+    const isActive=si2===si;
+    return `<div class="card-sm" style="${isActive?'border:2px solid var(--accent)':''}">
+      <div class="card-label" style="font-size:10px">${sc.name}</div>
+      <div style="font-size:18px;font-weight:500;letter-spacing:-.02em;color:${si2===si?'var(--accent)':'var(--ink)'}">$${sc.total.toFixed(4)}</div>
+      <div style="font-size:10px;color:var(--ink3);margin-top:2px">${sv!==null?'−'+sv+'% vs A':'base'}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('r-note').innerHTML=`<strong>${SCS[si].name}:</strong> Com ${vol} vídeos/mês de ${dur}min, custo anual: <strong>$${(monthly*12).toFixed(2)}</strong>. LLM: $${llmCost.toFixed(4)} | Stock: $${stockCost.toFixed(3)} | Animação: $${animCost.toFixed(3)} | Geração AI: $${genCost.toFixed(3)}.`;
+}
+
+// ─── COMBINED SCENARIOS ───────────────────────────────────────────────────────
+function renderCombined(){
+  const profiles=[
+    {name:'Volume máximo, custo mínimo', dur:1, vol:200, cx:0, si:3, cache:true, imgP:0, nImgs:3, vidP:0, nClips:2, animP:0, nAnim:4, useGen:false, genImgP:0, nGenImgs:0, genVidP:0, genVidS:0},
+    {name:'Produção diária + Ken Burns',  dur:2, vol:50,  cx:1, si:1, cache:true, imgP:2.5,nImgs:5,vidP:3,nClips:3,animP:0,nAnim:5,useGen:true,genImgP:0.067,nGenImgs:2,genVidP:0,genVidS:0},
+    {name:'Animação AI mid-tier (Hailuo)',dur:2, vol:50,  cx:1, si:1, cache:true, imgP:0,  nImgs:6, vidP:0, nClips:2, animP:0.028,nAnim:5,useGen:false,genImgP:0,nGenImgs:0,genVidP:0,genVidS:0},
+    {name:'Qualidade premium de marca',   dur:3, vol:20,  cx:2, si:0, cache:true, imgP:4,  nImgs:8, vidP:9, nClips:4, animP:0.070,nAnim:6,useGen:true,genImgP:0.134,nGenImgs:3,genVidP:0.05,genVidS:5},
+    {name:'Enterprise alta escala',       dur:5, vol:500, cx:1, si:1, cache:true, imgP:0,  nImgs:4, vidP:0, nClips:2, animP:0.017,nAnim:5,useGen:true,genImgP:0.045,nGenImgs:2,genVidP:0.02,genVidS:3},
+  ];
+
+  let html='';
+  profiles.forEach(p=>{
+    const mult=CXMULT[p.cx]*(0.7+p.dur*0.15);
+    const llm=AGENTS.reduce((s,_,i)=>s+agCost(i,p.si,p.cache,mult),0);
+    const stock=(p.imgP*p.nImgs)+(p.vidP*p.nClips);
+    const anim=(p.animP||0)*(p.nAnim||0);
+    const gen=p.useGen?(p.genImgP*p.nGenImgs)+(p.genVidP*p.genVidS):0;
+    const total=llm+stock+anim+gen, perMin=total/p.dur, monthly=total*p.vol;
+
+    html+=`<div class="card" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+        <div>
+          <div style="font-weight:500;font-size:15px;color:var(--ink);margin-bottom:4px">${p.name}</div>
+          <div style="font-size:12px;color:var(--ink3)">${p.dur}min · ${CXLBL[p.cx]} · ${p.vol} vídeos/mês · ${SCS[p.si].name}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--serif);font-size:28px;letter-spacing:-.02em">$${perMin.toFixed(4)}</div>
+          <div style="font-size:11px;color:var(--ink3)">por minuto de vídeo</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+        <div class="card-sm"><div class="card-label">Por vídeo</div><div style="font-size:18px;font-weight:500">$${total.toFixed(4)}</div></div>
+        <div class="card-sm"><div class="card-label">LLM</div><div style="font-size:18px;font-weight:500;color:var(--accent)">$${llm.toFixed(4)}</div></div>
+        <div class="card-sm"><div class="card-label">Stock assets</div><div style="font-size:18px;font-weight:500;color:var(--green)">$${stock.toFixed(3)}</div></div>
+        <div class="card-sm"><div class="card-label">Animações</div><div style="font-size:18px;font-weight:500;color:var(--teal)">$${anim.toFixed(3)}</div></div>
+        <div class="card-sm"><div class="card-label">Custo mensal</div><div style="font-size:18px;font-weight:500">$${monthly.toFixed(2)}</div></div>
+      </div>
+      <div class="bkd" style="margin-top:12px">
+        <div class="bkd-row"><div class="bkd-left"><div class="bkd-dot" style="background:var(--accent)"></div>LLM — ${SCS[p.si].name}</div><div class="bkd-cost">$${llm.toFixed(4)} (${Math.round(llm/total*100)}%)</div></div>
+        <div class="bkd-row"><div class="bkd-left"><div class="bkd-dot" style="background:var(--green)"></div>Stock — ${p.nImgs} imgs @$${p.imgP} + ${p.nClips} clips @$${p.vidP}</div><div class="bkd-cost">$${stock.toFixed(3)} (${Math.round(stock/total*100)}%)</div></div>
+        ${anim>0?`<div class="bkd-row"><div class="bkd-left"><div class="bkd-dot" style="background:var(--teal)"></div>Animação — ${p.nAnim}× clips ${(p.animP||0)===0?'Ken Burns CSS $0':'@$'+(p.animP||0)}</div><div class="bkd-cost" style="color:${(p.animP||0)===0?'var(--green)':'var(--ink)'}">$${anim.toFixed(3)} (${Math.round(anim/total*100)}%)</div></div>`:''}
+        ${p.useGen?`<div class="bkd-row"><div class="bkd-left"><div class="bkd-dot" style="background:var(--purple)"></div>Geração AI — ${p.nGenImgs} imgs + ${p.genVidS}s vídeo</div><div class="bkd-cost">$${gen.toFixed(3)} (${Math.round(gen/total*100)}%)</div></div>`:''}
+      </div>
+    </div>`;
+  });
+  document.getElementById('combined-scenarios').innerHTML=html;
+}
+
+
+// ─── ANIMATION PAGE ───────────────────────────────────────────────────────────
+const ANIM_CSS = [
+  {name:'Ken Burns',     desc:'Zoom + pan lento. Clássico, atemportal.', cost:'$0.00',badge:'b-green',badge_txt:'Gratuito'},
+  {name:'Parallax',      desc:'Camadas movem em velocidades diferentes criando profundidade.', cost:'$0.00',badge:'b-green',badge_txt:'Gratuito'},
+  {name:'Zoom Suave',    desc:'Scale in/out gradual. Mantém foco no sujeito.', cost:'$0.00',badge:'b-green',badge_txt:'Gratuito'},
+  {name:'Fade + Slide',  desc:'Elemento desliza + fade in/out. Transições limpas.', cost:'$0.00',badge:'b-green',badge_txt:'Gratuito'},
+  {name:'Lottie Overlay',desc:'Overlay vectorial animado (.json) sobre a imagem.', cost:'$0.00',badge:'b-green',badge_txt:'Gratuito'},
+  {name:'Morph SVG',     desc:'Transformação de formas SVG. Ideal para motion design.', cost:'$0.00',badge:'b-green',badge_txt:'Gratuito'},
+];
+const ANIM_AI = [
+  // ── Parallax / 2.5D (a camada mais barata) ─────────────────────────────
+  {name:'DepthFlow OSS',     provider:'Open Source (GPU)',    res:'até 8K', dur:'loop', costPerClip:0.000, badge:'b-green',  badge_txt:'Gratuito', note:'Self-hosted. Parallax 2.5D de alta qualidade. RTX 3060+. ComfyUI/Python.'},
+  {name:'Immersity AI',      provider:'Leia Inc.',            res:'1080p',  dur:'5s',   costPerClip:0.030, badge:'b-green',  badge_txt:'Parallax',  note:'Neural Depth Engine. 11 estilos: ken burns, dolly, órbita. API disponível.'},
+  // ── Image-to-Video curto (middle ground) ───────────────────────────────
+  {name:'Hailuo MiniMax',    provider:'MiniMax',              res:'1080p',  dur:'6s',   costPerClip:0.070, badge:'b-teal',   badge_txt:'Budget',    note:'Melhor custo-benefício I2V. $9.99/mês = ~40 clips. Qualidade social media.'},
+  {name:'Pika 2.3',          provider:'Pika Labs',            res:'1080p',  dur:'3s',   costPerClip:0.090, badge:'b-green',  badge_txt:'Rápido',    note:'Geração <2min (mais rápido do mercado). Pikaffects únicos. $8/mês.'},
+  {name:'Kling Standard',    provider:'Kuaishou',             res:'1080p',  dur:'5s',   costPerClip:0.110, badge:'b-blue',   badge_txt:'Mid',       note:'Melhor motion realism nesta faixa. $6.99/mês. Até 3min de vídeo total.'},
+  {name:'Seedance/WaveSpeed',provider:'ByteDance/WaveSpeedAI',res:'1080p',  dur:'5s',   costPerClip:0.150, badge:'b-blue',   badge_txt:'Mid',       note:'#8 Video Arena (Elo 1202). 1080p em <1min. Exclusive via WaveSpeedAI.'},
+  {name:'Kling Pro',         provider:'Kuaishou',             res:'1080p',  dur:'5s',   costPerClip:0.180, badge:'b-purple', badge_txt:'Mid+',      note:'$25.99/mês. Kling 2.6 + áudio nativo. Physics melhorado. Melhor close-ups.'},
+  {name:'Luma Ray2',         provider:'Luma AI',              res:'1080p',  dur:'5s',   costPerClip:0.200, badge:'b-amber',  badge_txt:'Premium',   note:'3D-aware. Ótimo para produtos e arquitetura. Geração ~30s.'},
+  {name:'Runway Gen-4 (5s)', provider:'Runway',               res:'1080p',  dur:'5s',   costPerClip:0.250, badge:'b-amber',  badge_txt:'Premium',   note:'Líder em character consistency. $12/mês. Melhor para cenas com pessoas.'},
+  // ── Referência: geração de vídeo full (para comparação de custo) ───────
+  {name:'Runway Gen-4 (10s)',provider:'Runway [vídeo full]',  res:'1080p',  dur:'10s',  costPerClip:0.500, badge:'b-red',    badge_txt:'Vídeo Full',note:'Para comparação: geração de vídeo full text-to-video.'},
+  {name:'Veo 3.0 (10s)',     provider:'Google [vídeo full]',  res:'1080p',  dur:'10s',  costPerClip:3.500, badge:'b-red',    badge_txt:'Vídeo Full',note:'Para comparação: $0.35/s = $3.50 por 10s de vídeo full.'},
+];
+
+function renderAnimation(){
+  // CSS Cards
+  document.getElementById('anim-css-cards').innerHTML = ANIM_CSS.map(e=>`
+    <div class="card-sm" style="margin-bottom:8px;display:flex;align-items:center;gap:10px">
+      <div style="width:34px;height:34px;border-radius:7px;background:#edfaf3;border:1px solid #9fe1cb;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🎞</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600;color:var(--ink)">${e.name} <span class="badge ${e.badge}">${e.badge_txt}</span></div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:2px">${e.desc}</div>
+      </div>
+      <div style="font-weight:600;font-size:13px;color:var(--green);flex-shrink:0">${e.cost}</div>
+    </div>
+  `).join('');
+
+  // AI Cards
+  document.getElementById('anim-ai-cards').innerHTML = ANIM_AI.slice(0,5).map(e=>`
+    <div class="card-sm" style="margin-bottom:8px;display:flex;align-items:center;gap:10px">
+      <div style="width:34px;height:34px;border-radius:7px;background:rgba(14,122,122,.08);border:1px solid rgba(14,122,122,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🤖</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600;color:var(--ink)">${e.name} <span class="badge ${e.badge}">${e.badge_txt}</span></div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:2px">${e.provider} · ${e.res} · ${e.dur}</div>
+      </div>
+      <div style="font-weight:600;font-size:13px;color:var(--ink);flex-shrink:0">$${e.costPerClip.toFixed(3)}</div>
+    </div>
+  `).join('');
+
+  // Catalog table
+  const rows = ANIM_AI.map(m=>`<tr>
+    <td><strong>${m.name}</strong></td>
+    <td style="color:var(--ink3);font-size:11px">${m.provider}</td>
+    <td>${m.res}</td>
+    <td>${m.dur}</td>
+    <td><strong>$${m.costPerClip.toFixed(3)}</strong></td>
+    <td>$${(m.costPerClip*10/5).toFixed(3)}</td>
+    <td><span class="badge ${m.badge}">${m.badge_txt}</span></td>
+    <td style="font-size:11px;color:var(--ink3)">${m.note}</td>
+  </tr>`).join('');
+  document.getElementById('anim-catalog-table').innerHTML=`<thead><tr><th>Modelo</th><th>Provedor</th><th>Resolução</th><th>Duração</th><th>$/clip</th><th>$/s eq.</th><th>Tier</th><th>Nota</th></tr></thead><tbody>${rows}</tbody>`;
+
+  updateAnimCalc();
+}
+
+function updateAnimCalc(){
+  const n    = +document.getElementById('acalc-n').value;
+  const cssPct = +document.getElementById('acalc-css').value/100;
+  const effect  = document.getElementById('acalc-effect').value;
+  const aiPrice = +document.getElementById('acalc-model').value;
+  const vol     = +document.getElementById('acalc-vol').value;
+  document.getElementById('acalc-n-l').textContent   = n;
+  document.getElementById('acalc-css-l').textContent = Math.round(cssPct*100)+'%';
+  document.getElementById('acalc-vol-l').textContent = vol;
+
+  const nCSS  = Math.round(n * cssPct);
+  const nAI   = n - nCSS;
+  const aiCost = nAI * aiPrice;
+  const totalCost = aiCost; // CSS is $0
+  const monthly = totalCost * vol;
+
+  const selectedModel = document.getElementById('acalc-model');
+  const modelName = selectedModel.options[selectedModel.selectedIndex].text.split(' —')[0];
+
+  // Comparison: what it would cost with text-to-video Wan 2.6 ($0.10/clip=5s)
+  const wanCost = n * 0.10;
+  const savings = (wanCost - totalCost) * vol;
+
+  document.getElementById('acalc-per-vid').textContent='$'+totalCost.toFixed(3);
+  document.getElementById('acalc-per-vid-s').textContent=`${nCSS} CSS $0 + ${nAI} AI @$${aiPrice}`;
+  document.getElementById('acalc-monthly').textContent='$'+monthly.toFixed(2);
+  document.getElementById('acalc-monthly-s').textContent=vol+' vídeos/mês';
+
+  // Breakdown
+  const bkd = `
+    <div class="bkd-row"><div class="bkd-left"><div class="bkd-dot" style="background:var(--green)"></div><span class="bkd-agent">Animação CSS/JS</span><span class="bkd-model">${effect} · ${nCSS} clips</span></div><div class="bkd-cost" style="color:var(--green)">$0.000</div></div>
+    <div class="bkd-row"><div class="bkd-left"><div class="bkd-dot" style="background:var(--teal)"></div><span class="bkd-agent">AI image-to-motion</span><span class="bkd-model">${modelName} · ${nAI} clips</span></div><div class="bkd-cost">$${aiCost.toFixed(3)}</div></div>
+    <div class="bkd-row" style="background:var(--paper2)"><div class="bkd-left"><div class="bkd-dot" style="background:var(--ink)"></div><span class="bkd-agent" style="font-weight:600">Total por vídeo</span></div><div class="bkd-cost" style="font-weight:600">$${totalCost.toFixed(3)}</div></div>
+  `;
+  document.getElementById('acalc-bkd').innerHTML=`<div class="bkd">${bkd}</div>`;
+
+  // Cost comparison bars
+  const comparisons = [
+    {label:'CSS/JS apenas ($0)',          cost:0,                   color:'var(--green)'},
+    {label:'Hailuo 2.3 Fast ($0.017)',    cost:n*0.017,             color:'var(--teal)'},
+    {label:'Configuração atual',          cost:totalCost,           color:'var(--accent)'},
+    {label:'Wan 2.6 text-to-vid ($0.10)',cost:wanCost,             color:'var(--amber)'},
+    {label:'Runway text-to-vid ($0.25)', cost:n*0.05*5,            color:'var(--red)'},
+  ];
+  const maxCost = Math.max(...comparisons.map(c=>c.cost), 0.001);
+  document.getElementById('acalc-bars').innerHTML = comparisons.map(c=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <div style="font-size:10px;color:var(--ink3);min-width:200px;font-family:var(--mono)">${c.label}</div>
+      <div style="flex:1;background:var(--paper2);border-radius:3px;height:14px;overflow:hidden">
+        <div style="width:${Math.max(c.cost/maxCost*100,1)}%;height:100%;background:${c.color};border-radius:3px;transition:width .3s"></div>
+      </div>
+      <div style="font-size:10px;font-weight:600;min-width:50px;text-align:right;font-family:var(--mono)">$${c.cost.toFixed(3)}</div>
+    </div>
+  `).join('');
+
+  // Savings
+  document.getElementById('acalc-savings').textContent='$'+Math.max(0,savings).toFixed(2);
+  document.getElementById('acalc-savings-s').textContent=`/mês · vs Wan 2.6 text-to-video nos mesmos ${n} clips`;
+
+  // Strategy note
+  document.getElementById('acalc-note').innerHTML=`<strong>Estratégia com ${Math.round(cssPct*100)}% CSS:</strong> ${nCSS} clips com ${effect} ($0) + ${nAI} clips com ${modelName} ($${aiCost.toFixed(3)}). Custo total por vídeo: <strong>$${totalCost.toFixed(3)}</strong> — vs $${wanCost.toFixed(3)} se usasse text-to-video (${((1-totalCost/Math.max(wanCost,0.001))*100).toFixed(0)}% mais barato).`;
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+const TABS={llm:'pg-llm',stock:'pg-stock',animation:'pg-animation',generation:'pg-generation',scenarios:'pg-scenarios',estimator:'pg-estimator'};
+function goTab(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById(TABS[id]).classList.add('on');
+  document.querySelectorAll('.tab-btn')[Object.keys(TABS).indexOf(id)].classList.add('on');
+  if(id==='stock') renderStock();
+  if(id==='animation') renderAnimation();
+  if(id==='generation') renderGeneration();
+  if(id==='scenarios') renderCombined();
+  if(id==='estimator') fullEst();
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+renderLLMCatalog();
+renderLLMAgents(0);
+fullEst();
+</script>
+</body>
+</html>

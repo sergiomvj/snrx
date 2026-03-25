@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VideoRobot — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Syne+Mono&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#060608;--deep:#0a0b12;--surface:#0e1018;--card:#12141f;
+  --card2:#171929;--border:#1a1d2e;--border2:#222538;--border3:#2d3050;
+  --txt:#e4e6f0;--txt2:#8890ab;--txt3:#4a5070;--txt4:#252840;
+  --red:#ff3d5a;--red2:#cc2040;--gold:#f5c518;--teal:#00d4bc;
+  --blue:#4d8fff;--green:#00d47a;--purple:#9060ff;--orange:#ff7c30;
+  --mono:"Syne Mono",monospace;
+  --serif:"Instrument Serif",Georgia,serif;
+  --sans:"Syne",system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--void);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.012) 3px,rgba(0,0,0,.012) 4px)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--deep)}
+::-webkit-scrollbar-thumb{background:var(--border3);border-radius:2px}
+
+/* DEMO BANNER */
+.demo-banner{
+  background:linear-gradient(90deg,rgba(245,197,24,.1) 0%,rgba(245,197,24,.05) 100%);
+  border-bottom:1px solid rgba(245,197,24,.2);padding:8px 24px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.06em;
+}
+.demo-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* TOPBAR */
+.topbar{
+  position:sticky;top:0;z-index:300;height:56px;
+  background:rgba(6,6,8,.96);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:0;
+}
+.logo{display:flex;align-items:center;gap:9px;margin-right:32px;text-decoration:none}
+.logo-box{width:28px;height:28px;background:var(--red);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-size:14px}
+.logo-name{font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--txt);text-transform:uppercase}
+.logo-sep{width:1px;height:16px;background:var(--border3);margin:0 16px}
+.logo-sub{font-size:10px;color:var(--txt3);font-family:var(--mono);letter-spacing:.1em}
+
+/* STEPPER */
+.stepper{display:flex;align-items:center;gap:0;flex:1;max-width:580px}
+.stp{display:flex;align-items:center;gap:7px;padding:4px 10px;border-radius:5px}
+.stp-n{width:21px;height:21px;border-radius:50%;border:1.5px solid var(--border3);
+  display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;
+  color:var(--txt3);font-family:var(--mono);flex-shrink:0}
+.stp-l{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--txt3)}
+.stp-line{flex:1;height:1px;background:var(--border2);max-width:36px}
+.stp.done .stp-n{background:var(--txt3);border-color:var(--txt3);color:var(--void)}
+.stp.done .stp-l{color:var(--txt3)}
+.stp.active .stp-n{background:var(--red);border-color:var(--red);color:white}
+.stp.active .stp-l{color:var(--red)}
+.tb-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.ai-pill{display:flex;align-items:center;gap:6px;background:var(--card);
+  border:1px solid rgba(0,212,188,.2);border-radius:6px;padding:5px 10px;
+  font-size:11px;font-weight:600;color:var(--teal);font-family:var(--mono)}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:var(--teal)}
+
+/* MAIN */
+.main{padding-top:0;min-height:100vh}
+.phase{display:none;animation:fadein .3s ease}
+.phase.on{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* PH-HEAD */
+.ph-head{
+  padding:32px 32px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;
+  position:relative;overflow:hidden;
+}
+.ph-head::before{content:"";position:absolute;right:-80px;top:-80px;width:280px;height:280px;
+  border-radius:50%;background:radial-gradient(circle,rgba(255,61,90,.06) 0%,transparent 70%);pointer-events:none}
+.ph-eye{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.ph-eye::before{content:"";width:16px;height:1px;background:var(--red);display:block}
+.ph-title{font-family:var(--serif);font-size:clamp(22px,2.8vw,34px);color:var(--txt);
+  letter-spacing:-.02em;line-height:1.05}
+.ph-title em{font-style:italic;color:var(--red)}
+.ph-desc{font-size:13px;color:var(--txt2);max-width:520px;line-height:1.75;margin-top:7px}
+.ph-actions{display:flex;gap:9px;align-items:center;flex-shrink:0}
+
+/* BUTTONS */
+.btn{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;border-radius:7px;padding:9px 20px;cursor:pointer;border:none;
+  transition:all .18s;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:var(--red);color:white}
+.btn-primary:hover{background:var(--red2)}
+.btn-outline{background:transparent;color:var(--txt2);border:1px solid var(--border3)}
+.btn-outline:hover{border-color:var(--txt3);color:var(--txt)}
+.btn-teal{background:rgba(0,212,188,.1);color:var(--teal);border:1px solid rgba(0,212,188,.2)}
+.btn-teal:hover{background:rgba(0,212,188,.18)}
+
+/* BODY */
+.ph-body{padding:24px 32px 32px}
+.col2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.col2{grid-template-columns:1fr}}
+
+/* BOX */
+.box{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.box-hd{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.box-hd-ico{width:25px;height:25px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.box-hd-lbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--txt2)}
+.box-body{padding:16px}
+
+/* MOCKUP MEDIA ITEMS */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:7px}
+.mitem{border-radius:7px;overflow:hidden;border:1px solid var(--border2);
+  background:var(--surface);aspect-ratio:1;position:relative}
+.mitem-thumb{width:100%;height:100%;object-fit:cover;display:flex;align-items:center;
+  justify-content:center;font-size:28px;background:var(--card2)}
+.mitem-badge{position:absolute;top:4px;left:4px;font-family:var(--mono);font-size:8px;
+  padding:2px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.06em}
+.mitem-selected::after{content:"✓";position:absolute;inset:0;background:rgba(255,61,90,.25);
+  display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--red)}
+
+/* ELEM CARDS */
+.elist{display:flex;flex-direction:column;gap:9px}
+.ecard{background:var(--surface);border:1px solid var(--border2);border-radius:8px;overflow:hidden}
+.ecard-hd{display:flex;align-items:center;gap:9px;padding:9px 13px}
+.ethumb{width:38px;height:38px;border-radius:6px;overflow:hidden;flex-shrink:0;
+  background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px}
+.ename{font-size:12px;font-weight:600;color:var(--txt)}
+.etype{font-family:var(--mono);font-size:9px;color:var(--txt3);margin-top:2px}
+.etags{display:flex;flex-wrap:wrap;gap:4px;padding:0 13px 10px}
+.etag{font-size:10px;padding:3px 8px;border-radius:20px;font-family:var(--mono);
+  background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.25);color:var(--red)}
+
+/* CHAT */
+.chat-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;display:flex;flex-direction:column}
+.chat-hd{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.da-ava{width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--red) 0%,var(--purple) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:14px;position:relative}
+.da-ava::after{content:"";position:absolute;bottom:0;right:0;width:8px;height:8px;
+  border-radius:50%;background:var(--green);border:2px solid var(--card)}
+.da-name{font-size:13px;font-weight:700;color:var(--txt)}
+.da-status{font-size:10px;color:var(--txt3);font-family:var(--mono)}
+.messages{padding:18px;display:flex;flex-direction:column;gap:14px;
+  min-height:300px;max-height:420px;overflow-y:auto}
+.msg{display:flex;gap:9px}
+.msg.user{flex-direction:row-reverse}
+.msg-ava{width:27px;height:27px;border-radius:50%;flex-shrink:0;margin-top:2px;
+  display:flex;align-items:center;justify-content:center;font-size:11px}
+.msg.da .msg-ava{background:linear-gradient(135deg,var(--red),var(--purple))}
+.msg.user .msg-ava{background:var(--card2);border:1px solid var(--border3);color:var(--txt2)}
+.msg-bbl{max-width:80%;padding:11px 15px;border-radius:11px;font-size:13px;line-height:1.7;color:var(--txt)}
+.msg.da .msg-bbl{background:var(--card2);border:1px solid var(--border2);border-bottom-left-radius:3px}
+.msg.user .msg-bbl{background:rgba(255,61,90,.09);border:1px solid rgba(255,61,90,.18);border-bottom-right-radius:3px}
+.msg-bbl strong{color:var(--txt);font-weight:600}
+.msg-bbl em{color:var(--gold);font-style:italic}
+.msg-time{font-size:9px;color:var(--txt3);font-family:var(--mono);margin-top:3px;text-align:left}
+.msg.user .msg-time{text-align:right}
+
+/* ANALYSIS CARD */
+.analysis-card{
+  background:linear-gradient(135deg,rgba(255,61,90,.06) 0%,rgba(144,96,255,.04) 100%);
+  border:1px solid rgba(255,61,90,.15);border-radius:12px;padding:18px;margin-top:18px;
+}
+.analysis-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.analysis-icon{width:36px;height:36px;border-radius:8px;
+  background:linear-gradient(135deg,var(--red),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-size:16px}
+.analysis-title{font-size:13px;font-weight:700;color:var(--txt)}
+.analysis-sub{font-size:10px;color:var(--txt3);font-family:var(--mono)}
+.analysis-body{font-size:13px;color:var(--txt2);line-height:1.75}
+.analysis-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.atag{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:20px;
+  background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.2);color:var(--red)}
+.atag.gold{background:rgba(245,197,24,.1);border-color:rgba(245,197,24,.2);color:var(--gold)}
+.atag.teal{background:rgba(0,212,188,.1);border-color:rgba(0,212,188,.2);color:var(--teal)}
+
+/* IDEAS */
+.idea-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:700px){.idea-grid{grid-template-columns:1fr}}
+.idea-card{background:var(--surface);border:1px solid var(--border2);border-radius:10px;
+  padding:14px;cursor:pointer;transition:all .2s;position:relative}
+.idea-card:hover{border-color:var(--border3)}
+.idea-card.selected{border-color:var(--red);background:rgba(255,61,90,.05)}
+.idea-card .isel{position:absolute;top:10px;right:10px;width:16px;height:16px;
+  border-radius:50%;border:1.5px solid var(--border3);display:flex;align-items:center;
+  justify-content:center;font-size:9px;transition:all .2s}
+.idea-card.selected .isel{background:var(--red);border-color:var(--red);color:white}
+.idea-num{font-family:var(--mono);font-size:9px;color:var(--txt3);margin-bottom:6px;text-transform:uppercase}
+.idea-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:5px;line-height:1.3}
+.idea-body{font-size:12px;color:var(--txt2);line-height:1.6}
+.idea-tone{display:flex;align-items:center;gap:5px;margin-top:8px}
+.tone-dot{width:6px;height:6px;border-radius:50%}
+.tone-lbl{font-family:var(--mono);font-size:9px;color:var(--txt3);text-transform:uppercase}
+
+/* ORDER DOC */
+.order-doc{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.order-doc-hd{padding:16px 22px;border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,rgba(255,61,90,.05) 0%,transparent 60%);
+  display:flex;align-items:center;justify-content:space-between}
+.order-doc-title{font-family:var(--serif);font-size:20px;color:var(--txt)}
+.order-doc-id{font-family:var(--mono);font-size:11px;color:var(--txt3)}
+.order-body{padding:22px}
+.order-section{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.order-section:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.order-sec-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.order-sec-title::before{content:"";width:3px;height:12px;border-radius:2px;background:var(--red)}
+.order-field{display:flex;gap:10px;margin-bottom:7px;font-size:13px}
+.of-label{color:var(--txt3);min-width:110px;flex-shrink:0}
+.of-value{color:var(--txt);font-weight:500}
+.order-instr{background:var(--surface);border:1px solid var(--border2);border-radius:6px;
+  padding:12px;font-size:12px;color:var(--txt2);line-height:1.7;white-space:pre-wrap}
+.da-summary-box{background:linear-gradient(135deg,rgba(255,61,90,.08) 0%,rgba(144,96,255,.05) 100%);
+  border:1px solid rgba(255,61,90,.12);border-radius:8px;padding:14px;
+  font-size:13px;color:var(--txt2);line-height:1.7}
+.da-summary-box strong{color:var(--txt)}
+
+/* SIDEBAR */
+.order-sidebar{display:flex;flex-direction:column;gap:14px}
+.cost-breakdown{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.cb-hd{padding:13px 16px;border-bottom:1px solid var(--border);
+  font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--txt2)}
+.cb-body{padding:14px 16px}
+.cb-row{display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.cb-row:last-child{border-bottom:none;padding-top:10px}
+.cb-label{color:var(--txt3)}
+.cb-val{color:var(--txt);font-family:var(--mono);font-weight:600}
+.cb-row.total .cb-label{color:var(--txt);font-weight:700;font-size:13px}
+.cb-row.total .cb-val{color:var(--gold);font-size:14px}
+.meta-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.meta-row{display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
+.meta-row:last-child{border-bottom:none}
+.meta-label{color:var(--txt3);font-family:var(--mono)}
+.meta-val{color:var(--txt);font-weight:600}
+
+/* QUEUE SUCCESS */
+.queue-success{text-align:center;padding:24px;background:rgba(0,212,122,.05);
+  border:1px solid rgba(0,212,122,.15);border-radius:12px}
+.qs-ico{font-size:40px;margin-bottom:12px}
+.qs-title{font-family:var(--serif);font-size:22px;color:var(--txt);margin-bottom:6px}
+.qs-sub{font-size:13px;color:var(--txt2)}
+.qs-id{font-family:var(--mono);font-size:12px;color:var(--teal);margin-top:10px;
+  background:rgba(0,212,188,.08);border:1px solid rgba(0,212,188,.15);
+  border-radius:6px;padding:8px 14px;display:inline-block}
+
+/* PARAMS SIDEBAR */
+.params-sidebar{display:flex;flex-direction:column;gap:10px}
+.param-item{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:12px}
+.param-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--txt3);margin-bottom:8px}
+.param-chips{display:flex;flex-wrap:wrap;gap:5px}
+.pchip{font-family:var(--mono);font-size:10px;padding:4px 9px;border-radius:4px;
+  background:var(--card);border:1px solid var(--border2);color:var(--txt3)}
+.pchip.on{background:rgba(255,61,90,.1);border-color:rgba(255,61,90,.3);color:var(--red)}
+.param-val-display{font-family:var(--mono);font-size:11px;color:var(--red);text-align:right;margin-top:4px}
+.param-bar{width:100%;height:4px;background:var(--border2);border-radius:2px;margin-top:6px;overflow:hidden}
+.param-bar-fill{height:100%;border-radius:2px;background:var(--red);transition:width .3s}
+
+/* PHASE CONTENT LAYOUT */
+.phase-layout{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
+@media(max-width:1100px){.phase-layout{grid-template-columns:1fr}}
+.bs-layout{display:grid;grid-template-columns:2fr 1fr;gap:18px;align-items:start}
+@media(max-width:1000px){.bs-layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- DEMO BANNER -->
+<div class="demo-banner">
+  <div class="demo-dot"></div>
+  <span>MODO DEMO — Dados mockados para apresentação. Nenhuma API real é chamada nesta versão.</span>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-box">🎬</div>
+    <div>
+      <div class="logo-name">VideoRobot</div>
+    </div>
+  </div>
+  <div class="logo-sep"></div>
+  <div class="logo-sub" style="margin-right:28px">Diretor de Arte IA</div>
+  <div class="stepper" id="stepper">
+    <div class="stp done" id="stp-1"><div class="stp-n">✓</div><div class="stp-l">Elementos</div></div>
+    <div class="stp-line"></div>
+    <div class="stp done" id="stp-2"><div class="stp-n">✓</div><div class="stp-l">Conferência</div></div>
+    <div class="stp-line"></div>
+    <div class="stp done" id="stp-3"><div class="stp-n">✓</div><div class="stp-l">BrainStorm</div></div>
+    <div class="stp-line"></div>
+    <div class="stp active" id="stp-4"><div class="stp-n">4</div><div class="stp-l">Ordem</div></div>
+  </div>
+  <div class="tb-right">
+    <div class="ai-pill">
+      <div class="ai-dot"></div>
+      <span>claude-sonnet-4-6</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- PHASE NAV (simplified demo controls) -->
+  <div style="background:var(--deep);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <span style="font-family:var(--mono);font-size:10px;color:var(--txt3);margin-right:8px;letter-spacing:.1em">DEMO — NAVEGUE PELAS FASES:</span>
+    <button onclick="showPhase(1)" class="btn btn-outline" style="font-size:10px;padding:5px 14px">① Elementos</button>
+    <button onclick="showPhase(2)" class="btn btn-outline" style="font-size:10px;padding:5px 14px">② Conferência</button>
+    <button onclick="showPhase(3)" class="btn btn-outline" style="font-size:10px;padding:5px 14px">③ BrainStorm</button>
+    <button onclick="showPhase(4)" class="btn btn-primary" style="font-size:10px;padding:5px 14px">④ Ordem Final ★</button>
+  </div>
+
+  <!-- ════ FASE 1 ════ -->
+  <div class="phase" id="phase-1">
+    <div class="ph-head">
+      <div>
+        <div class="ph-eye">Fase 01</div>
+        <div class="ph-title">Upload de <em>Elementos</em></div>
+        <div class="ph-desc">Arquivos de referência enviados com instruções individuais e parâmetros gerais da produção.</div>
+      </div>
+      <div class="ph-actions">
+        <button class="btn btn-primary" onclick="showPhase(2)">Próximo: Conferência →</button>
+      </div>
+    </div>
+    <div class="ph-body">
+      <div class="col2">
+        <div class="box">
+          <div class="box-hd">
+            <div class="box-hd-ico" style="background:rgba(255,61,90,.12);color:var(--red)">📁</div>
+            <div class="box-hd-lbl">Arquivos de referência</div>
+            <div style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--txt3);background:var(--surface);border:1px solid var(--border2);padding:2px 7px;border-radius:3px">7 arquivos</div>
+          </div>
+          <div class="box-body">
+            <div class="mgrid">
+              <div class="mitem mitem-selected">
+                <div class="mitem-thumb" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">🏢</div>
+                <div class="mitem-badge" style="background:rgba(77,143,255,.3);color:var(--blue)">IMG</div>
+              </div>
+              <div class="mitem">
+                <div class="mitem-thumb" style="background:linear-gradient(135deg,#0d1117,#1c1c1c)">📱</div>
+                <div class="mitem-badge" style="background:rgba(77,143,255,.3);color:var(--blue)">IMG</div>
+              </div>
+              <div class="mitem mitem-selected">
+                <div class="mitem-thumb" style="background:linear-gradient(135deg,#1a2a1a,#0d2b0d)">🌿</div>
+                <div class="mitem-badge" style="background:rgba(77,143,255,.3);color:var(--blue)">IMG</div>
+              </div>
+              <div class="mitem">
+                <div class="mitem-thumb" style="background:linear-gradient(135deg,#2a1a0d,#1c0d05)">☕</div>
+                <div class="mitem-badge" style="background:rgba(77,143,255,.3);color:var(--blue)">IMG</div>
+              </div>
+              <div class="mitem mitem-selected">
+                <div class="mitem-thumb" style="background:linear-gradient(135deg,#0a0a1a,#1a0a2a)">🎬</div>
+                <div class="mitem-badge" style="background:rgba(245,197,24,.3);color:var(--gold)">VID</div>
+              </div>
+              <div class="mitem">
+                <div class="mitem-thumb" style="background:linear-gradient(135deg,#1a1a1a,#2a2a2a)">👤</div>
+                <div class="mitem-badge" style="background:rgba(77,143,255,.3);color:var(--blue)">IMG</div>
+              </div>
+              <div class="mitem">
+                <div class="mitem-thumb" style="background:var(--card2)">🔷</div>
+                <div class="mitem-badge" style="background:rgba(77,143,255,.3);color:var(--blue)">IMG</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-hd">
+            <div class="box-hd-ico" style="background:rgba(0,212,188,.1);color:var(--teal)">🎯</div>
+            <div class="box-hd-lbl">Instruções por elemento</div>
+          </div>
+          <div class="box-body">
+            <div class="elist">
+              <div class="ecard">
+                <div class="ecard-hd">
+                  <div class="ethumb">🏢</div>
+                  <div>
+                    <div class="ename">sede_empresa.jpg</div>
+                    <div class="etype">🖼 Imagem</div>
+                  </div>
+                </div>
+                <div class="etags">
+                  <span class="etag">Abertura</span>
+                  <span class="etag">Destaque</span>
+                </div>
+              </div>
+              <div class="ecard">
+                <div class="ecard-hd">
+                  <div class="ethumb">🌿</div>
+                  <div>
+                    <div class="ename">produto_hero.jpg</div>
+                    <div class="etype">🖼 Imagem</div>
+                  </div>
+                </div>
+                <div class="etags">
+                  <span class="etag">Produto</span>
+                  <span class="etag">Destaque</span>
+                </div>
+              </div>
+              <div class="ecard">
+                <div class="ecard-hd">
+                  <div class="ethumb">🎬</div>
+                  <div>
+                    <div class="ename">making_of.mp4</div>
+                    <div class="etype">🎬 Vídeo</div>
+                  </div>
+                </div>
+                <div class="etags">
+                  <span class="etag">B-Roll</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="box" style="margin-top:18px">
+        <div class="box-hd">
+          <div class="box-hd-ico" style="background:rgba(245,197,24,.1);color:var(--gold)">✍️</div>
+          <div class="box-hd-lbl">Instruções gerais de produção</div>
+        </div>
+        <div class="box-body">
+          <div class="col2">
+            <div style="background:var(--surface);border:1px solid var(--border2);border-radius:7px;padding:14px;font-size:13px;color:var(--txt2);line-height:1.7">
+              Quero um vídeo institucional de 60 segundos para LinkedIn. Tom profissional e aspiracional. A abertura deve ser impactante com a fachada da empresa, seguida de foco no produto em câmera lenta. Encerrar com logo e tagline "Inovação que transforma".
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="background:var(--surface);border:1px solid var(--border2);border-radius:7px;padding:12px">
+                <div style="font-size:10px;color:var(--txt3);font-family:var(--mono);margin-bottom:5px">CANAL</div>
+                <div style="font-size:13px;font-weight:600;color:var(--txt)">LinkedIn</div>
+              </div>
+              <div style="background:var(--surface);border:1px solid var(--border2);border-radius:7px;padding:12px">
+                <div style="font-size:10px;color:var(--txt3);font-family:var(--mono);margin-bottom:5px">DURAÇÃO</div>
+                <div style="font-size:13px;font-weight:600;color:var(--txt)">60 segundos</div>
+              </div>
+              <div style="background:var(--surface);border:1px solid var(--border2);border-radius:7px;padding:12px">
+                <div style="font-size:10px;color:var(--txt3);font-family:var(--mono);margin-bottom:5px">TOM</div>
+                <div style="font-size:13px;font-weight:600;color:var(--txt)">Profissional</div>
+              </div>
+              <div style="background:var(--surface);border:1px solid var(--border2);border-radius:7px;padding:12px">
+                <div style="font-size:10px;color:var(--txt3);font-family:var(--mono);margin-bottom:5px">PÚBLICO</div>
+                <div style="font-size:13px;font-weight:600;color:var(--txt)">Gestores B2B</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ FASE 2 ════ -->
+  <div class="phase" id="phase-2">
+    <div class="ph-head">
+      <div>
+        <div class="ph-eye">Fase 02</div>
+        <div class="ph-title">Conferência com o <em>Diretor de Arte</em></div>
+        <div class="ph-desc">O DA examinou todos os elementos e abriu o diálogo de refinamento.</div>
+      </div>
+      <div class="ph-actions">
+        <button class="btn btn-outline" onclick="showPhase(1)">← Voltar</button>
+        <button class="btn btn-primary" onclick="showPhase(3)">BrainStorm →</button>
+      </div>
+    </div>
+    <div class="ph-body">
+      <div class="phase-layout">
+        <div>
+          <!-- Review grid -->
+          <div class="box" style="margin-bottom:18px">
+            <div class="box-hd">
+              <div class="box-hd-ico" style="background:rgba(77,143,255,.1);color:var(--blue)">🔍</div>
+              <div class="box-hd-lbl">Elementos em análise</div>
+            </div>
+            <div class="box-body">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px">
+                <div style="background:var(--surface);border:1px solid var(--border2);border-radius:9px;overflow:hidden">
+                  <div style="height:80px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:32px">🏢</div>
+                  <div style="padding:8px"><div style="font-size:11px;font-weight:600;color:var(--txt)">sede_empresa.jpg</div><div style="font-size:10px;color:var(--txt3);margin-top:3px">Abertura · Destaque</div></div>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border2);border-radius:9px;overflow:hidden">
+                  <div style="height:80px;background:linear-gradient(135deg,#1a2a1a,#0d2b0d);display:flex;align-items:center;justify-content:center;font-size:32px">🌿</div>
+                  <div style="padding:8px"><div style="font-size:11px;font-weight:600;color:var(--txt)">produto_hero.jpg</div><div style="font-size:10px;color:var(--txt3);margin-top:3px">Produto · Destaque</div></div>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border2);border-radius:9px;overflow:hidden">
+                  <div style="height:80px;background:linear-gradient(135deg,#0a0a1a,#1a0a2a);display:flex;align-items:center;justify-content:center;font-size:32px">🎬</div>
+                  <div style="padding:8px"><div style="font-size:11px;font-weight:600;color:var(--txt)">making_of.mp4</div><div style="font-size:10px;color:var(--gold);margin-top:3px">B-Roll · Vídeo</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Analysis -->
+          <div class="analysis-card">
+            <div class="analysis-hd">
+              <div class="analysis-icon">🎨</div>
+              <div>
+                <div class="analysis-title">Análise do Diretor de Arte</div>
+                <div class="analysis-sub">claude-sonnet-4-6 · 847ms</div>
+              </div>
+            </div>
+            <div class="analysis-body">
+              <p>Recebi um material <strong>muito bem estruturado</strong> — você tem todos os ingredientes para um vídeo institucional de impacto. A fachada da empresa tem potência visual para uma abertura cinematográfica, e o produto hero tem potencial para câmera lenta.</p>
+              <p>Minha leitura: o <em>arco emocional ideal</em> é de escala → detalhe → propósito. Começa grande (empresa), vai para o específico (produto), termina com significado (impacto humano + logo).</p>
+              <p>Uma pergunta antes de avançar: o vídeo do making_of — você quer usar como B-roll autêntico ou prefere que eu sugira stock que complemente melhor visualmente?</p>
+            </div>
+            <div class="analysis-tags">
+              <span class="atag">cinematográfico</span>
+              <span class="atag gold">aspiracional</span>
+              <span class="atag teal">escala → detalhe</span>
+              <span class="atag">profissional</span>
+              <span class="atag gold">storytelling</span>
+              <span class="atag teal">LinkedIn B2B</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-wrap">
+          <div class="chat-hd">
+            <div class="da-ava">🎬</div>
+            <div style="flex:1">
+              <div class="da-name">Diretor de Arte</div>
+              <div class="da-status">Análise concluída · Aguardando resposta</div>
+            </div>
+          </div>
+          <div class="messages">
+            <div class="msg da">
+              <div class="msg-ava">🎬</div>
+              <div>
+                <div class="msg-bbl">Analisei seus 7 elementos. Material excelente — você tem tudo para um institucional de nível premium. Vou propor uma abordagem cinematográfica com arco escala→detalhe→propósito.</div>
+                <div class="msg-time">14:22</div>
+              </div>
+            </div>
+            <div class="msg user">
+              <div class="msg-ava">👤</div>
+              <div>
+                <div class="msg-bbl">Use o making_of como B-roll autêntico mesmo — dá autenticidade à marca</div>
+                <div class="msg-time">14:24</div>
+              </div>
+            </div>
+            <div class="msg da">
+              <div class="msg-ava">🎬</div>
+              <div>
+                <div class="msg-bbl">Ótima escolha. O <strong>B-roll autêntico</strong> é muito mais valioso que stock genérico — cria identificação imediata. Vou integrar o making_of nos momentos de transição entre produto e a cena final. <em>Podemos avançar para o BrainStorm.</em></div>
+                <div class="msg-time">14:24</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ FASE 3 ════ -->
+  <div class="phase" id="phase-3">
+    <div class="ph-head">
+      <div>
+        <div class="ph-eye">Fase 03</div>
+        <div class="ph-title"><em>BrainStorm</em> Criativo</div>
+        <div class="ph-desc">4 conceitos propostos pelo Diretor de Arte. Conceito 2 selecionado após refinamento.</div>
+      </div>
+      <div class="ph-actions">
+        <button class="btn btn-outline" onclick="showPhase(2)">← Voltar</button>
+        <button class="btn btn-primary" onclick="showPhase(4)">Finalizar Ordem →</button>
+      </div>
+    </div>
+    <div class="ph-body">
+      <div class="bs-layout">
+        <div>
+          <div class="box" style="margin-bottom:18px">
+            <div class="box-hd">
+              <div class="box-hd-ico" style="background:rgba(144,96,255,.1);color:var(--purple)">💡</div>
+              <div class="box-hd-lbl">Conceitos criativos gerados</div>
+              <div style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--red);background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.15);padding:2px 8px;border-radius:3px">1 selecionado</div>
+            </div>
+            <div class="box-body">
+              <div class="idea-grid">
+                <div class="idea-card">
+                  <div class="isel"></div>
+                  <div class="idea-num">Conceito 01</div>
+                  <div class="idea-title">Arquitetura do Futuro</div>
+                  <div class="idea-body">Abre com drone da fachada, desce para o produto. Foco em linhas e geometria. Tom frio e técnico.</div>
+                  <div class="idea-tone"><div class="tone-dot" style="background:#ff3d5a"></div><span class="tone-lbl">Técnico · Preciso</span></div>
+                </div>
+                <div class="idea-card selected">
+                  <div class="isel">✓</div>
+                  <div class="idea-num">Conceito 02 ★</div>
+                  <div class="idea-title">Precisão em Movimento</div>
+                  <div class="idea-body">Câmera lenta nos detalhes do produto. Corte para uso real no dia a dia. Encerra com impacto humano.</div>
+                  <div class="idea-tone"><div class="tone-dot" style="background:#f5c518"></div><span class="tone-lbl">Aspiracional · Humano</span></div>
+                </div>
+                <div class="idea-card">
+                  <div class="isel"></div>
+                  <div class="idea-num">Conceito 03</div>
+                  <div class="idea-title">Por Dentro da Marca</div>
+                  <div class="idea-body">Documental estilo making_of. Time, processos, bastidores. Autenticidade máxima.</div>
+                  <div class="idea-tone"><div class="tone-dot" style="background:#00d4bc"></div><span class="tone-lbl">Autêntico · Documentary</span></div>
+                </div>
+                <div class="idea-card">
+                  <div class="isel"></div>
+                  <div class="idea-num">Conceito 04</div>
+                  <div class="idea-title">Minimalismo Impactante</div>
+                  <div class="idea-body">Produto no centro. Fundo neutro. Movimento mínimo. Fala o logo. Silêncio dramático.</div>
+                  <div class="idea-tone"><div class="tone-dot" style="background:#9060ff"></div><span class="tone-lbl">Minimalista · Elegante</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-wrap">
+            <div class="chat-hd">
+              <div class="da-ava">🎬</div>
+              <div style="flex:1">
+                <div class="da-name">Diretor de Arte</div>
+                <div class="da-status">Modo BrainStorm · Conceito 02 confirmado</div>
+              </div>
+            </div>
+            <div class="messages">
+              <div class="msg da">
+                <div class="msg-ava">🎬</div>
+                <div>
+                  <div class="msg-bbl">Criei 4 conceitos para o seu institucional LinkedIn. O <strong>Conceito 02 — Precisão em Movimento</strong> é minha recomendação principal: alia o apelo técnico com calor humano, ideal para gestores B2B.</div>
+                  <div class="msg-time">14:31</div>
+                </div>
+              </div>
+              <div class="msg user">
+                <div class="msg-ava">👤</div>
+                <div>
+                  <div class="msg-bbl">Gostei do 02. Mas no encerramento quero mais emoção — menos técnico, mais inspiracional</div>
+                  <div class="msg-time">14:33</div>
+                </div>
+              </div>
+              <div class="msg da">
+                <div class="msg-ava">🎬</div>
+                <div>
+                  <div class="msg-bbl">Perfeito. Vou ajustar o arco emocional: o encerramento terá um <em>momento humano</em> — rosto de pessoa usando o produto, fade slow — antes do logo aparecer. Intensidade emocional elevada para 4/5. Isso vai criar o impacto que você quer.</div>
+                  <div class="msg-time">14:34</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="params-sidebar">
+          <div style="font-size:11px;color:var(--txt3);font-family:var(--mono);margin-bottom:4px;letter-spacing:.08em;text-transform:uppercase">Parâmetros de produção</div>
+          <div class="param-item">
+            <div class="param-label">Estilo Visual</div>
+            <div class="param-chips">
+              <span class="pchip on">Cinematográfico</span>
+              <span class="pchip">Documental</span>
+              <span class="pchip">Minimalista</span>
+            </div>
+          </div>
+          <div class="param-item">
+            <div class="param-label">Ritmo de Edição</div>
+            <div class="param-bar"><div class="param-bar-fill" style="width:60%"></div></div>
+            <div class="param-val-display">Médio</div>
+          </div>
+          <div class="param-item">
+            <div class="param-label">Intensidade Emocional</div>
+            <div class="param-bar"><div class="param-bar-fill" style="width:80%"></div></div>
+            <div class="param-val-display">Intenso</div>
+          </div>
+          <div class="param-item">
+            <div class="param-label">Paleta Cromática</div>
+            <div class="param-chips">
+              <span class="pchip on">Natural</span>
+              <span class="pchip">Frio</span>
+              <span class="pchip">Quente</span>
+            </div>
+          </div>
+          <div class="param-item">
+            <div class="param-label">Presença de Voz</div>
+            <div class="param-chips">
+              <span class="pchip on">Narração em off</span>
+              <span class="pchip">Música apenas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ FASE 4 ════ -->
+  <div class="phase on" id="phase-4">
+    <div class="ph-head">
+      <div>
+        <div class="ph-eye">Fase 04</div>
+        <div class="ph-title">Ordem de <em>Produção</em></div>
+        <div class="ph-desc">Job gerado, revisado e pronto para a fila do VideoFlow.</div>
+      </div>
+      <div class="ph-actions">
+        <button class="btn btn-outline" onclick="showPhase(3)">← Voltar</button>
+        <button class="btn btn-teal">📋 Copiar JSON</button>
+        <button class="btn btn-outline">⬇ Download</button>
+      </div>
+    </div>
+    <div class="ph-body">
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start">
+        <!-- Main doc -->
+        <div class="order-doc">
+          <div class="order-doc-hd">
+            <div>
+              <div class="order-doc-title">Ordem de Produção VideoFlow</div>
+              <div class="order-doc-id">VR-847291 · Gerado em 25/03/2026 14:36</div>
+            </div>
+          </div>
+          <div class="order-body">
+            <div class="order-section">
+              <div class="order-sec-title">Briefing</div>
+              <div class="order-field"><span class="of-label">Título do job</span><span class="of-value">Institucional LinkedIn — Lançamento Produto 2026</span></div>
+              <div class="order-field"><span class="of-label">Objetivo</span><span class="of-value">Apresentar o produto para gestores B2B com tom aspiracional e profissional</span></div>
+              <div class="order-field"><span class="of-label">Público-alvo</span><span class="of-value">Gestores e executivos B2B, 30–50 anos</span></div>
+              <div class="order-field"><span class="of-label">Canal</span><span class="of-value">LinkedIn</span></div>
+              <div class="order-field"><span class="of-label">Duração</span><span class="of-value">60 segundos</span></div>
+            </div>
+            <div class="order-section">
+              <div class="order-sec-title">Conceito Criativo</div>
+              <div class="order-field"><span class="of-label">Nome</span><span class="of-value">Precisão em Movimento</span></div>
+              <div class="da-summary-box">
+                <p>Narrativa em câmera lenta sobre os detalhes do produto, criando fascínio antes da revelação completa. Corte preciso para momento de uso real — humanizando a tecnologia. Encerramento emocional com rosto de usuário + fade para logo.</p>
+                <p style="margin-top:10px"><strong>Abordagem visual:</strong> Cinematográfico · Luz natural fria · Profundidade de campo estreita nos close-ups de produto.</p>
+                <p style="margin-top:6px"><strong>Arco emocional:</strong> Curiosidade → Admiração → Confiança → Inspiração</p>
+              </div>
+            </div>
+            <div class="order-section">
+              <div class="order-sec-title">Parâmetros de Produção</div>
+              <div class="order-field"><span class="of-label">Estilo visual</span><span class="of-value">Cinematográfico</span></div>
+              <div class="order-field"><span class="of-label">Paleta cromática</span><span class="of-value">Natural frio — tons de azul e cinza neutros</span></div>
+              <div class="order-field"><span class="of-label">Ritmo de edição</span><span class="of-value">Médio (3/5)</span></div>
+              <div class="order-field"><span class="of-label">Intensidade emocional</span><span class="of-value">Intenso (4/5)</span></div>
+              <div class="order-field"><span class="of-label">Voz</span><span class="of-value">Narração em off</span></div>
+            </div>
+            <div class="order-section">
+              <div class="order-sec-title">Uso dos Elementos</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;gap:10px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 12px">
+                  <div style="width:36px;height:36px;border-radius:5px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏢</div>
+                  <div><div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:2px">sede_empresa.jpg</div><div style="font-size:11px;color:var(--txt3)">Abertura impactante — primeiros 4 segundos. Câmera simulando movimento de drone descendente.</div></div>
+                </div>
+                <div style="display:flex;gap:10px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 12px">
+                  <div style="width:36px;height:36px;border-radius:5px;background:linear-gradient(135deg,#1a2a1a,#0d2b0d);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🌿</div>
+                  <div><div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:2px">produto_hero.jpg</div><div style="font-size:11px;color:var(--txt3)">Seção central (8s–40s). Câmera lenta 120fps simulada. Múltiplos close-ups de ângulos diferentes.</div></div>
+                </div>
+                <div style="display:flex;gap:10px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 12px">
+                  <div style="width:36px;height:36px;border-radius:5px;background:linear-gradient(135deg,#0a0a1a,#1a0a2a);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🎬</div>
+                  <div><div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:2px">making_of.mp4</div><div style="font-size:11px;color:var(--txt3)">B-roll de transição (40s–52s). Autentica a narrativa humana antes do encerramento.</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="order-section">
+              <div class="order-sec-title">Diretrizes do Diretor de Arte</div>
+              <div class="order-instr">Priorize texturas e reflexos nos primeiros close-ups — o espectador do LinkedIn assiste sem som nos primeiros 3s, então o impacto visual é tudo. Use parallax 2.5D na fachada para dar sensação de profundidade. No encerramento, deixe 2 segundos de silêncio visual antes do logo aparecer — isso amplifica o impacto emocional. Narração em off deve começar apenas no segundo 6.</div>
+            </div>
+            <div class="order-section">
+              <div class="order-sec-title">Cenas-Chave</div>
+              <div class="order-field"><span class="of-label">Cena 1</span><span class="of-value">Abertura cinematográfica — fachada empresa, parallax 2.5D, 4s</span></div>
+              <div class="order-field"><span class="of-label">Cena 2</span><span class="of-value">Reveal do produto — zoom suave, câmera lenta, close-ups de detalhes, 20s</span></div>
+              <div class="order-field"><span class="of-label">Cena 3</span><span class="of-value">Uso real — making_of B-roll, contexto humano, 12s</span></div>
+              <div class="order-field"><span class="of-label">Cena 4</span><span class="of-value">Encerramento emocional — fade lento, silêncio 2s, logo + tagline, 8s</span></div>
+            </div>
+            <div class="order-section">
+              <div class="order-sec-title">Sugestão Musical</div>
+              <div class="da-summary-box">Trilha instrumental minimalista — piano + cordas suaves. BPM 72–80. Sem percussão até a cena 3. Crescendo emocional nos últimos 15 segundos. Referência: Nils Frahm, Ólafur Arnalds. Licença comercial obrigatória.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="order-sidebar">
+          <div class="cost-breakdown">
+            <div class="cb-hd">📊 Estimativa de Custo</div>
+            <div class="cb-body">
+              <div class="cb-row"><span class="cb-label">LLM (Fases 1–3)</span><span class="cb-val">$0.0084</span></div>
+              <div class="cb-row"><span class="cb-label">Assets de stock</span><span class="cb-val">$0.00</span></div>
+              <div class="cb-row"><span class="cb-label">Animação parallax</span><span class="cb-val">$0.03</span></div>
+              <div class="cb-row"><span class="cb-label">Geração AI img</span><span class="cb-val">$0.134</span></div>
+              <div class="cb-row"><span class="cb-label">Render / Edição</span><span class="cb-val">$0.08</span></div>
+              <div class="cb-row total"><span class="cb-label">Total estimado</span><span class="cb-val">$0.2524</span></div>
+            </div>
+          </div>
+          <div class="meta-box">
+            <div class="meta-row"><span class="meta-label">Modelo IA</span><span class="meta-val">claude-sonnet-4-6</span></div>
+            <div class="meta-row"><span class="meta-label">Arquivos</span><span class="meta-val">7</span></div>
+            <div class="meta-row"><span class="meta-label">Canal</span><span class="meta-val">LinkedIn</span></div>
+            <div class="meta-row"><span class="meta-label">Duração</span><span class="meta-val">60 segundos</span></div>
+            <div class="meta-row"><span class="meta-label">Tom</span><span class="meta-val">Profissional</span></div>
+            <div class="meta-row"><span class="meta-label">Estilo</span><span class="meta-val">Cinematográfico</span></div>
+            <div class="meta-row"><span class="meta-label">Conceito</span><span class="meta-val">Precisão em Movimento</span></div>
+          </div>
+          <div class="queue-success">
+            <div class="qs-ico">✅</div>
+            <div class="qs-title">Job enviado!</div>
+            <div class="qs-sub">Ordem enviada para a fila do VideoFlow.</div>
+            <div class="qs-id">VR-847291</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPhase(n) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('on'));
+  document.getElementById('phase-' + n).classList.add('on');
+  [1,2,3,4].forEach(i => {
+    const s = document.getElementById('stp-' + i);
+    s.className = 'stp';
+    const num = s.querySelector('.stp-n');
+    if(i < n) { s.classList.add('done'); num.textContent = '✓'; }
+    else if(i === n) { s.classList.add('active'); num.textContent = i; }
+    else { num.textContent = i; }
+  });
+  window.scrollTo({top:56,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
